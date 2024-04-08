@@ -240,7 +240,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         height: 32,
                       ),
                     if (parent == false)
-                      CustomButton(press: () {} //Login,
+                      CustomButton(label: 'Log in', press: () {} //Login,
                           ),
                     if (parent == false)
                       SizedBox(
