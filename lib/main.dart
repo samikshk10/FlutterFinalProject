@@ -10,7 +10,7 @@ void main() => runApp(MaterialApp(
             backgroundColor: Colors.purple,
             titleTextStyle: TextStyle(fontSize: 24, color: Colors.white)),
       ),
-      initialRoute: '/',
+      initialRoute: '/signup',
       routes: {
         '/': (context) => LoginScreen(),
         '/signup': (context) => SignUpScreen(),
