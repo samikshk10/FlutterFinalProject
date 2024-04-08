@@ -3,17 +3,17 @@ import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:flutter/foundation.dart';
 
 
-class AuthMethods{
+class AuthMethods {
   static FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-  static Future<dynamic> loginWithEmailAndPassword(
-      String email, String password) async {
+  static Future<dynamic> loginWithEmailAndPassword(String email,
+      String password) async {
     try {
-          String res = "Some error occured";
+      String res = "Some error occured";
 
       auth.UserCredential result = await auth.FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
-      res= "success";
+      res = "success";
     } on auth.FirebaseAuthException catch (exception, s) {
       debugPrint('$exception$s');
       switch ((exception).code) {
@@ -38,7 +38,7 @@ class AuthMethods{
   static logout() async {
     await auth.FirebaseAuth.instance.signOut();
   }
-
+}
   
  
 

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutterprojectfinal/screens/auth/login/login_screen.dart';
+import 'package:flutterprojectfinal/screens/auth/signup/signup_screen.dart';
+import 'package:flutterprojectfinal/ui/homepage/home_page.dart';
 
 void main() => runApp(MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -11,5 +13,7 @@ void main() => runApp(MaterialApp(
       initialRoute: '/',
       routes: {
         '/': (context) => LoginScreen(),
+        '/signup': (context) => SignUpScreen(),
+        '/home': (context) => HomePage()
       },
     ));
