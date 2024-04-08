@@ -31,7 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
     String txt1 = "", txt2 = "";
     Pics pics = Pics();
     bool parent = false;
-    Future<dynamic> Login(String email, String password) async {
+    /*Future<dynamic> Login(String email, String password) async {
       try {
         auth.UserCredential result = await auth.FirebaseAuth.instance
             .signInWithEmailAndPassword(email: email, password: password);
@@ -64,7 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
         debugPrint('$e$s');
         return 'Login failed, Please try again.';
       }
-    }
+    } */
 
     void setstring() {
       _passwordController.text = txt2;
@@ -240,9 +240,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         height: 32,
                       ),
                     if (parent == false)
-                      CustomButton(
-                        press: Login,
-                      ),
+                      CustomButton(press: () {} //Login,
+                          ),
                     if (parent == false)
                       SizedBox(
                         height: 32,
