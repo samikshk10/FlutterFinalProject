@@ -2,12 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:flutter/foundation.dart';
 
-
 class AuthMethods {
   static FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-  static Future<dynamic> loginWithEmailAndPassword(String email,
-      String password) async {
+  static Future<dynamic> loginWithEmailAndPassword(
+      String email, String password) async {
     try {
       String res = "Some error occured";
 
@@ -35,11 +34,23 @@ class AuthMethods {
     }
   }
 
-  static logout() async {
-    await auth.FirebaseAuth.instance.signOut();
+  static Future<dynamic> signupEmailandPassword(
+      String email, String password) async {
+    try {
+      if (email.isNotEmpty && password.isNotEmpty) {
+        await auth.FirebaseAuth.instance
+            .createUserWithEmailAndPassword(email: email, password: password);
+      } else {
+        return "Please enter email and password";
+      }
+    } on auth.FirebaseAuthMultiFactorException catch (e) {
+      print(e.code + "this is code");
+      print(e.message);
+      if (e.code == 'user-not-found') {
+        print('No user found for that email.');
+      } else if (e.code == 'invalid-credential') {
+        print('Wrong password provided for that user.');
+      }
+    }
   }
 }
-  
- 
-
-  
