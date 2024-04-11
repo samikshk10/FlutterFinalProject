@@ -12,7 +12,7 @@ class AuthMethods {
 
       auth.UserCredential result = await auth.FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
-      res = "success";
+      return res = "success";
     } on auth.FirebaseAuthException catch (exception, s) {
       debugPrint('$exception$s');
       switch ((exception).code) {
@@ -36,10 +36,12 @@ class AuthMethods {
 
   static Future<dynamic> signupEmailandPassword(
       String email, String password) async {
+    print(email + password);
     try {
       if (email.isNotEmpty && password.isNotEmpty) {
         await auth.FirebaseAuth.instance
             .createUserWithEmailAndPassword(email: email, password: password);
+        return "signup successfully";
       } else {
         return "Please enter email and password";
       }
