@@ -90,7 +90,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           final errors =
                               userSchema.catchErrors({"email": value});
                           return errors["email"];
-                        
                         },
                       ),
                       SizedBox(height: 24),
@@ -109,10 +108,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         },
                         type: TextInputType.visiblePassword,
                         validate: (String? value) {
-                           final errors =
+                          final errors =
                               userSchema.catchErrors({"password": value});
                           return errors["password"];
-                        },
                         },
                       ),
                       SizedBox(height: 20),
