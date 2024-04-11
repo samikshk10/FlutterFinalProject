@@ -5,6 +5,8 @@ import 'package:flutterprojectfinal/screens/customWidgets/divider.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/formField.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/googleSignInButton.dart';
 import 'package:flutterprojectfinal/utils/constant.dart';
+import 'package:flutterprojectfinal/services.dart/auth.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
@@ -18,6 +20,32 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
   bool isPasswordVisible = true;
+
+  void handleSignUP() {
+    // Implement SignUp
+    AuthMethods.signupEmailandPassword(
+      _emailController.text.trim(),
+      _passwordController.text.trim(),
+    ).then((value) async {
+      Fluttertoast.showToast(
+          msg: value,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    }).catchError((error) {
+      Fluttertoast.showToast(
+          msg: error.toString(),
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,32 +79,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   padding: EdgeInsets.symmetric(horizontal: 40),
                   child: Column(
                     children: [
-                      customFormField(
-                        controller: _nameController,
-                        label: 'FirstName',
-                        prefix: Icons.account_circle,
-                        type: TextInputType.text,
-                        validate: (String? value) {
-                          if (value!.isEmpty) {
-                            return 'FirstName must not be empty';
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(height: 24),
-                      customFormField(
-                        controller: _nameController,
-                        label: 'LastName',
-                        prefix: Icons.account_circle,
-                        type: TextInputType.text,
-                        validate: (String? value) {
-                          if (value!.isEmpty) {
-                            return 'LastName must not be empty';
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(height: 24),
                       customFormField(
                         controller: _emailController,
                         label: 'Email',
@@ -123,12 +125,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 },
               ),
               SizedBox(height: 32),
-              CustomButton(
-                label: 'SignUp',
-                press: () {
-                  // Implement Sign Up
-                },
-              ),
+              CustomButton(label: 'SignUp', press: handleSignUP),
             ],
           ),
         ),
