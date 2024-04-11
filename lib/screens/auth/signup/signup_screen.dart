@@ -6,6 +6,7 @@ import 'package:flutterprojectfinal/screens/customWidgets/formField.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/googleSignInButton.dart';
 import 'package:flutterprojectfinal/utils/constant.dart';
 import 'package:flutterprojectfinal/services.dart/auth.dart';
+import 'package:flutterprojectfinal/validators/authValidators.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -20,7 +21,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
   bool isPasswordVisible = true;
-
+  final _formKey = GlobalKey<FormState>();
   void handleSignUP() {
     // Implement SignUp
     AuthMethods.signupEmailandPassword(
@@ -75,6 +76,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
               SizedBox(height: 32),
               Form(
+                key: _formKey,
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 40),
                   child: Column(
@@ -85,10 +87,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         prefix: Icons.email,
                         type: TextInputType.emailAddress,
                         validate: (String? value) {
-                          if (value!.isEmpty) {
-                            return 'Email must not be empty';
-                          }
-                          return null;
+                          final errors =
+                              userSchema.catchErrors({"email": value});
+                          return errors["email"];
+                        
                         },
                       ),
                       SizedBox(height: 24),
@@ -107,10 +109,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         },
                         type: TextInputType.visiblePassword,
                         validate: (String? value) {
-                          if (value!.isEmpty) {
-                            return 'Password is too short';
-                          }
-                          return null;
+                           final errors =
+                              userSchema.catchErrors({"password": value});
+                          return errors["password"];
+                        },
                         },
                       ),
                       SizedBox(height: 20),
@@ -125,7 +127,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 },
               ),
               SizedBox(height: 32),
-              CustomButton(label: 'SignUp', press: handleSignUP),
+              CustomButton(
+                label: 'SignUp',
+                press: () {
+                  if (_formKey.currentState!.validate()) {
+                    handleSignUP;
+                  }
+                },
+              ),
             ],
           ),
         ),
