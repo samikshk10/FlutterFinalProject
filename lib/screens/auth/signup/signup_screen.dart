@@ -6,7 +6,8 @@ import 'package:flutterprojectfinal/screens/customWidgets/formField.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/googleSignInButton.dart';
 import 'package:flutterprojectfinal/utils/constant.dart';
 import 'package:flutterprojectfinal/services.dart/auth.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:toastification/toastification.dart';
+//import 'package:fluttertoast/fluttertoast.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
@@ -27,23 +28,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
       _emailController.text.trim(),
       _passwordController.text.trim(),
     ).then((value) async {
-      Fluttertoast.showToast(
-          msg: value,
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.CENTER,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0);
+      toastification.show(
+        context: context,
+        title: Text(value),
+        autoCloseDuration: const Duration(seconds: 5),
+      );
     }).catchError((error) {
-      Fluttertoast.showToast(
-          msg: error.toString(),
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.CENTER,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0);
+      toastification.show(
+        context: context,
+        title: Text(error.toString()),
+        autoCloseDuration: const Duration(seconds: 5),
+      );
     });
   }
 

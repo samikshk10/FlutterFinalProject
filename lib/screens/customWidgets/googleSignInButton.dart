@@ -9,7 +9,7 @@ class GoogleSignInButton extends StatelessWidget {
     Key? key,
   }) : super(key: key);
 
-  final VoidCallback onPressed;
+  final onPressed;
 
   @override
   Widget build(BuildContext context) {
