@@ -7,6 +7,7 @@ Widget customFormField({
   required String? Function(String?) validate,
   required String label,
   required IconData prefix,
+  String? errorText,
   IconData? suffix,
   Function()? suffixPressed,
 }) =>
@@ -16,6 +17,7 @@ Widget customFormField({
       obscureText: isPassword,
       validator: validate,
       decoration: InputDecoration(
+        errorText: errorText,
         filled: true,
         fillColor: Colors.white,
         contentPadding: const EdgeInsets.all(18),

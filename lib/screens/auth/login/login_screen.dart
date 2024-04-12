@@ -1,13 +1,16 @@
+import 'package:ez_validator/ez_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterprojectfinal/screens/auth/forgotpassword/forgotpassword.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/circuledButton.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/customButton.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/divider.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/formField.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/googleSignInButton.dart';
+import 'package:flutterprojectfinal/services/auth.dart';
 import 'package:flutterprojectfinal/ui/homepage/home_page.dart';
 import 'package:flutterprojectfinal/utils/constant.dart';
-import 'package:flutterprojectfinal/services.dart/auth.dart';
+import 'package:flutterprojectfinal/validators/authValidators.dart';
 import 'package:toastification/toastification.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -21,6 +24,9 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool isPasswordVisible = true;
+  String emailError = "";
+  String passwordError = "";
+  final _formKey = GlobalKey<FormState>();
 
   void handleLogin(BuildContext dialogcontext) async {
     try {
@@ -93,6 +99,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               SizedBox(height: 32),
               Form(
+                key: _formKey,
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 40),
                   child: Column(
@@ -103,10 +110,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         prefix: Icons.email,
                         type: TextInputType.emailAddress,
                         validate: (String? value) {
-                          if (value!.isEmpty) {
-                            return 'Email must not b  e empty';
-                          }
-                          return null;
+                          final errors =
+                              userSchema.catchErrors({"email": value});
+                          return errors["email"];
                         },
                       ),
                       SizedBox(height: 24),
@@ -125,10 +131,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         },
                         type: TextInputType.visiblePassword,
                         validate: (String? value) {
-                          if (value!.isEmpty) {
-                            return 'Password is too short';
-                          }
-                          return null;
+                          final errors =
+                              userSchema.catchErrors({"password": value});
+                          return errors["password"];
                         },
                       ),
                       SizedBox(height: 20),
@@ -142,12 +147,40 @@ class _LoginScreenState extends State<LoginScreen> {
                     handleGoogleSignIn(context);
                   },
                   child: Text('Sign in with Google')),
+              SizedBox(height: 8),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ResetPassword(
+                          email: _emailController.text.toString().trim()),
+                    ),
+                  );
+                },
+                child: Text(
+                  "Forgot Password?",
+                  style: TextStyle(
+                    color: Colors.blue,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ),
+              SizedBox(height: 24),
+              GoogleSignInButton(
+                onPressed: () {
+                  // Implement Google Sign In
+                },
+              ),
               SizedBox(height: 32),
               CustomButton(
-                  label: 'Login',
-                  press: () {
+                label: 'Login',
+                press: () {
+                  if (_formKey.currentState!.validate()) {
                     handleLogin(context);
-                  }),
+                  }
+                },
+              )
             ],
           ),
         ),
