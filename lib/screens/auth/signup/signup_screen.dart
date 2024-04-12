@@ -5,7 +5,7 @@ import 'package:flutterprojectfinal/screens/customWidgets/divider.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/formField.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/googleSignInButton.dart';
 import 'package:flutterprojectfinal/utils/constant.dart';
-import 'package:flutterprojectfinal/services.dart/auth.dart';
+import 'package:flutterprojectfinal/services/auth.dart';
 import 'package:flutterprojectfinal/validators/authValidators.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -19,15 +19,16 @@ class SignUpScreen extends StatefulWidget {
 class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _nameController = TextEditingController();
   bool isPasswordVisible = true;
   final _formKey = GlobalKey<FormState>();
   void handleSignUP() {
+    print("here is");
     // Implement SignUp
     AuthMethods.signupEmailandPassword(
       _emailController.text.trim(),
       _passwordController.text.trim(),
     ).then((value) async {
+      print("success");
       Fluttertoast.showToast(
           msg: value,
           toastLength: Toast.LENGTH_SHORT,
@@ -129,7 +130,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 label: 'SignUp',
                 press: () {
                   if (_formKey.currentState!.validate()) {
-                    handleSignUP;
+                    print("here");
+                    handleSignUP();
                   }
                 },
               ),
