@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:flutter/foundation.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthMethods {
   static FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -56,6 +57,20 @@ class AuthMethods {
         print('Wrong password provided for that user.');
       }
     }
+  }
+
+  static Future<dynamic> signInWithGoogle() async {
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+    final GoogleSignInAuthentication? googleAuth =
+        await googleUser?.authentication;
+    auth.AuthCredential credential = auth.GoogleAuthProvider.credential(
+      accessToken: googleAuth?.accessToken,
+      idToken: googleAuth?.idToken,
+    );
+    final auth.UserCredential userCredential =
+        await auth.FirebaseAuth.instance.signInWithCredential(credential);
+    print(userCredential.user?.displayName);
+    return 'success';
   }
 
   Future<void> sendPasswordResetEmail(String email) async {

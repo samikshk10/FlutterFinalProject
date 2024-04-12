@@ -7,11 +7,11 @@ import 'package:flutterprojectfinal/screens/customWidgets/customButton.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/divider.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/formField.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/googleSignInButton.dart';
+import 'package:flutterprojectfinal/services/auth.dart';
 import 'package:flutterprojectfinal/ui/homepage/home_page.dart';
 import 'package:flutterprojectfinal/utils/constant.dart';
-import 'package:flutterprojectfinal/services/auth.dart';
 import 'package:flutterprojectfinal/validators/authValidators.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:toastification/toastification.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -41,14 +41,11 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         );
       } else {
-        Fluttertoast.showToast(
-            msg: response,
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.CENTER,
-            timeInSecForIosWeb: 3,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-            fontSize: 16.0);
+        toastification.show(
+          context: response,
+          title: Text('Hello, world!'),
+          autoCloseDuration: const Duration(seconds: 5),
+        );
       }
     } on FirebaseAuthException catch (e) {
       print(e.code + "this is code");
@@ -58,6 +55,19 @@ class _LoginScreenState extends State<LoginScreen> {
       } else if (e.code == 'invalid-credential') {
         print('Wrong password provided for that user.');
       }
+    }
+  }
+
+  handleGoogleSignIn(BuildContext context) async {
+    var response = await AuthMethods.signInWithGoogle();
+    print(response);
+    if (response == "success") {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HomePage(),
+        ),
+      );
     }
   }
 
@@ -131,6 +141,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
               ),
+              SizedBox(height: 32),
+              ElevatedButton(
+                  onPressed: () {
+                    handleGoogleSignIn(context);
+                  },
+                  child: Text('Sign in with Google')),
               SizedBox(height: 8),
               GestureDetector(
                 onTap: () {
