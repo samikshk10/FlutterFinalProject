@@ -1,6 +1,7 @@
 import 'package:ez_validator/ez_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterprojectfinal/screens/auth/forgotpassword/forgotpassword.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/circuledButton.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/customButton.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/divider.dart';
@@ -8,7 +9,7 @@ import 'package:flutterprojectfinal/screens/customWidgets/formField.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/googleSignInButton.dart';
 import 'package:flutterprojectfinal/ui/homepage/home_page.dart';
 import 'package:flutterprojectfinal/utils/constant.dart';
-import 'package:flutterprojectfinal/services.dart/auth.dart';
+import 'package:flutterprojectfinal/services/auth.dart';
 import 'package:flutterprojectfinal/validators/authValidators.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -130,7 +131,26 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
               ),
-              SizedBox(height: 32),
+              SizedBox(height: 8),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ResetPassword(
+                          email: _emailController.text.toString().trim()),
+                    ),
+                  );
+                },
+                child: Text(
+                  "Forgot Password?",
+                  style: TextStyle(
+                    color: Colors.blue,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ),
+              SizedBox(height: 24),
               GoogleSignInButton(
                 onPressed: () {
                   // Implement Google Sign In

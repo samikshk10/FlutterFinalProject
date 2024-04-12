@@ -26,6 +26,8 @@ class AuthMethods {
           return 'This user has been disabled.';
         case 'too-many-requests':
           return 'Too many attempts to sign in as this user.';
+        case 'invalid-credential':
+          return "Incorrect email or password";
       }
       return 'Unexpected firebase error, Please try again.';
     } catch (e, s) {
@@ -46,6 +48,20 @@ class AuthMethods {
         return "Please enter email and password";
       }
     } on auth.FirebaseAuthMultiFactorException catch (e) {
+      print(e.code + "this is code");
+      print(e.message);
+      if (e.code == 'user-not-found') {
+        print('No user found for that email.');
+      } else if (e.code == 'invalid-credential') {
+        print('Wrong password provided for that user.');
+      }
+    }
+  }
+
+  Future<void> sendPasswordResetEmail(String email) async {
+    try {
+      await auth.FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+    } on auth.FirebaseAuthException catch (e) {
       print(e.code + "this is code");
       print(e.message);
       if (e.code == 'user-not-found') {
