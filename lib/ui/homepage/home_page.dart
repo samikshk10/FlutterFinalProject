@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../model/category.dart';
 import '../../model/event.dart';
@@ -31,7 +32,8 @@ class HomePage extends StatelessWidget {
                       child: Row(
                         children: <Widget>[
                           Text(
-                            "LOCAL EVENTS",
+                            FirebaseAuth.instance.currentUser!.displayName ??
+                                "ANONYMOUS",
                             style: fadedTextStyle,
                           ),
                           Spacer(),

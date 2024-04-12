@@ -38,12 +38,14 @@ class AuthMethods {
   }
 
   static Future<dynamic> signupEmailandPassword(
-      String email, String password) async {
+      String email, String password, String username) async {
     print(email + password);
     try {
-      if (email.isNotEmpty && password.isNotEmpty) {
-        await auth.FirebaseAuth.instance
+      if (email.isNotEmpty && password.isNotEmpty && username.isNotEmpty) {
+        auth.UserCredential userCred = await auth.FirebaseAuth.instance
             .createUserWithEmailAndPassword(email: email, password: password);
+        await userCred.user!.updateDisplayName(username);
+
         return "signup successfully";
       } else {
         return "Please enter email and password";
