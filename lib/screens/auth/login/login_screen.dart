@@ -42,8 +42,8 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       } else {
         toastification.show(
-          context: response,
-          title: Text('Hello, world!'),
+          context: context,
+          title: Text(response),
           autoCloseDuration: const Duration(seconds: 5),
         );
       }
@@ -167,13 +167,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               SizedBox(height: 24),
-              GoogleSignInButton(
-                onPressed: () {
-                  // Implement Google Sign In
-                  handleGoogleSignIn(context);
-                },
-              ),
-              SizedBox(height: 32),
               CustomButton(
                 label: 'Login',
                 press: () {
