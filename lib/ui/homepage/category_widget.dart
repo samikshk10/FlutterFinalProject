@@ -28,16 +28,16 @@ class CategoryWidget extends StatelessWidget {
         height: 90,
         decoration: BoxDecoration(
           border: Border.all(
-              color: isSelected ? Colors.white : Color(0x99FFFFFF), width: 3),
+              color: isSelected ? Colors.black : Colors.blue, width: 3),
           borderRadius: BorderRadius.all(Radius.circular(16)),
-          color: isSelected ? Colors.white : Colors.transparent,
+          color: isSelected ? Colors.blue : Colors.transparent,
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Icon(
               category.icon,
-              color: isSelected ? Theme.of(context).primaryColor : Colors.white,
+              color: isSelected ? Theme.of(context).primaryColor : Colors.black,
               size: 40,
             ),
             SizedBox(
