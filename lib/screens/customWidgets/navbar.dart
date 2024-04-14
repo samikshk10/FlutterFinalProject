@@ -1,37 +1,14 @@
 import 'package:flutter/material.dart';
 
-class MyNavigationBar extends StatefulWidget {
-  const MyNavigationBar({Key? key}) : super(key: key);
+class MyNavigationBar extends StatelessWidget {
+  final int selectedIndex;
+  final Function(int) onItemTapped;
 
-  @override
-  State<MyNavigationBar> createState() => _MyNavigationBarState();
-}
-
-class _MyNavigationBarState extends State<MyNavigationBar> {
-  int _selectedIndex = 0;
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-      // You can put your navigation logic here
-      switch (index) {
-        case 0:
-          Navigator.pushNamed(context, '/');
-          break;
-        case 1:
-          Navigator.pushNamed(context, '/signup');
-          break;
-        case 2:
-          Navigator.pushNamed(context, '/');
-          break;
-        case 3:
-          Navigator.pushNamed(context, '/signup');
-          break;
-        default:
-          break;
-      }
-    });
-  }
+  const MyNavigationBar({
+    Key? key,
+    required this.selectedIndex,
+    required this.onItemTapped,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -40,9 +17,9 @@ class _MyNavigationBarState extends State<MyNavigationBar> {
       elevation: 0,
       animationDuration: const Duration(seconds: 3),
       labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
-      selectedIndex: _selectedIndex,
+      selectedIndex: selectedIndex,
       backgroundColor: Colors.white,
-      onDestinationSelected: _onItemTapped,
+      onDestinationSelected: onItemTapped,
       destinations: [
         NavigationDestination(
           icon: Icon(

@@ -8,7 +8,7 @@ import 'package:flutterprojectfinal/screens/customWidgets/divider.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/formField.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/googleSignInButton.dart';
 import 'package:flutterprojectfinal/services/auth.dart';
-import 'package:flutterprojectfinal/ui/homepage/home_page.dart';
+import 'package:flutterprojectfinal/ui/homepage/page_render.dart';
 import 'package:flutterprojectfinal/utils/constant.dart';
 import 'package:flutterprojectfinal/validators/authValidators.dart';
 import 'package:toastification/toastification.dart';
@@ -37,7 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => HomePage(),
+            builder: (context) => PageRender(),
           ),
         );
       } else {
@@ -65,7 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => HomePage(),
+          builder: (context) => PageRender(),
         ),
       );
     }

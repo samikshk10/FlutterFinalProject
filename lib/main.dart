@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutterprojectfinal/screens/auth/login/login_screen.dart';
 import 'package:flutterprojectfinal/screens/auth/signup/signup_screen.dart';
-import 'package:flutterprojectfinal/ui/homepage/home_page.dart';
+import 'package:flutterprojectfinal/ui/homepage/page_render.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
@@ -17,11 +17,11 @@ void main() async {
           backgroundColor: Colors.purple,
           titleTextStyle: TextStyle(fontSize: 24, color: Colors.white)),
     ),
-    initialRoute: '/home',
+    initialRoute: '/',
     routes: {
       '/': (context) => LoginScreen(),
       '/signup': (context) => SignUpScreen(),
-      '/home': (context) => HomePage()
+      '/home': (context) => PageRender()
     },
   ));
 }
