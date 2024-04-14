@@ -36,9 +36,9 @@ class HomePage extends StatelessWidget {
         create: (_) => AppState(),
         child: Stack(
           children: <Widget>[
-            HomePageBackground(
-              screenHeight: MediaQuery.of(context).size.height,
-            ),
+            // HomePageBackground(
+            //   screenHeight: MediaQuery.of(context).size.height,
+            // ),
             SafeArea(
               child: SingleChildScrollView(
                 child: Column(
@@ -61,7 +61,7 @@ class HomePage extends StatelessWidget {
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 14,
-                                  color: Colors.white))
+                                  color: Colors.black))
                         ],
                       ),
                     ),
@@ -69,7 +69,7 @@ class HomePage extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 32.0),
                       child: Text(
                         "What's Up",
-                        style: whiteHeadingTextStyle,
+                        style: blackHeadingTextStyle,
                       ),
                     ),
                     _buildSearch(), // Add the search widget here

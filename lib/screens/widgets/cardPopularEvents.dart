@@ -14,59 +14,121 @@ class CardPopularEvent extends StatelessWidget {
       width: 250,
       height: 270,
       margin: const EdgeInsets.only(left: 8, right: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: Stack(
         children: [
-          Expanded(
-            child: _buildCardImage(),
-          ),
-          const SizedBox(height: 8),
+          _buildCardImage(),
           _buildCardDesc(),
         ],
       ),
     );
   }
 
-  Widget _buildCardImage() => ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: Image.network(
-          eventModel.imagePath,
-          fit: BoxFit.cover,
+  Widget _buildCardImage() => Container(
+        width: 250,
+        height: 300,
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: AppColors.whiteColor,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Stack(
+            children: [
+              Image.network(
+                eventModel.imagePath,
+                fit: BoxFit.cover,
+                width: double.infinity,
+                height: double.infinity,
+              ),
+              Positioned(
+                right: 8,
+                top: 8,
+                child: Container(
+                  height: 50,
+                  width: 35,
+                  decoration: BoxDecoration(
+                    color: AppColors.whiteColor,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        eventModel.date.split(" ")[0],
+                      ),
+                      Text(
+                        eventModel.date.split(" ")[1],
+                        style: const TextStyle(
+                          color: AppColors.primaryColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            ],
+          ),
         ),
       );
 
-  Widget _buildCardDesc() => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: AppColors.whiteColor,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              eventModel.title,
-              style: const TextStyle(fontWeight: FontWeight.w500),
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 6),
-            Row(
-              children: [
-                Icon(Icons.location_on, color: Colors.grey),
-                SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    eventModel.location,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: AppColors.greyTextColor,
+  Widget _buildCardDesc() => Positioned(
+        bottom: 0,
+        right: 0,
+        left: 0,
+        child: Container(
+          height: 60,
+          width: 110,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+          margin: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+              color: AppColors.whiteColor,
+              borderRadius: BorderRadius.circular(12)),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      eventModel.title,
+                      style: const TextStyle(fontWeight: FontWeight.w500),
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        Icon(Icons.location_on, color: Colors.grey),
+                        SizedBox(width: 8),
+                        Flexible(
+                          child: Text(
+                            eventModel.location,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: AppColors.greyTextColor,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
                 ),
-              ],
-            ),
-          ],
+              ),
+              Container(
+                width: 30,
+                height: 30,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryLightColor,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(Icons.thumb_up, size: 18),
+              )
+            ],
+          ),
         ),
       );
 }

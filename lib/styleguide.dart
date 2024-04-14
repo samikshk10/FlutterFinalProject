@@ -12,14 +12,17 @@ final TextStyle whiteHeadingTextStyle = TextStyle(
   color: Color(0xFFFFFFFF),
 );
 
+final TextStyle blackHeadingTextStyle =
+    TextStyle(fontSize: 40.0, fontWeight: FontWeight.bold, color: Colors.black);
+
 final TextStyle categoryTextStyle = TextStyle(
   fontSize: 14.0,
   fontWeight: FontWeight.bold,
-  color: Color(0xFFFFFFFF),
+  color: Colors.black,
 );
 
 final TextStyle selectedCategoryTextStyle = categoryTextStyle.copyWith(
-  color: Color(0xFFFF4700),
+  color: Colors.white,
 );
 
 final TextStyle eventTitleTextStyle = TextStyle(
