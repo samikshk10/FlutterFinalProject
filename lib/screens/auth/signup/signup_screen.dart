@@ -20,15 +20,15 @@ class SignUpScreen extends StatefulWidget {
 class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
   bool isPasswordVisible = true;
   final _formKey = GlobalKey<FormState>();
   void handleSignUP() {
     print("here is");
     // Implement SignUp
-    AuthMethods.signupEmailandPassword(
-      _emailController.text.trim(),
-      _passwordController.text.trim(),
-    ).then((value) async {
+    AuthMethods.signupEmailandPassword(_emailController.text.trim(),
+            _passwordController.text.trim(), _usernameController.text.trim())
+        .then((value) async {
       toastification.show(
         context: context,
         title: Text(value),
@@ -44,6 +44,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _usernameController.dispose();
+    super.dispose();
+  }
+
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
 
@@ -76,6 +83,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   padding: EdgeInsets.symmetric(horizontal: 40),
                   child: Column(
                     children: [
+                      customFormField(
+                        controller: _usernameController,
+                        label: 'Username',
+                        prefix: Icons.person,
+                        type: TextInputType.text,
+                        validate: (String? value) {
+                          final errors =
+                              userSchema.catchErrors({"username": value});
+                          return errors["username"];
+                        },
+                      ),
+                      SizedBox(height: 24),
                       customFormField(
                         controller: _emailController,
                         label: 'Email',
