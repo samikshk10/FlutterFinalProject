@@ -170,6 +170,7 @@ class _LoginScreenState extends State<LoginScreen> {
               GoogleSignInButton(
                 onPressed: () {
                   // Implement Google Sign In
+                  handleGoogleSignIn(context);
                 },
               ),
               SizedBox(height: 32),
