@@ -52,19 +52,19 @@ class _HomePageState extends State<HomePage> {
                           style: fadedTextStyle,
                         ),
                         Spacer(),
-                        Text(
-                          "Welcome " +
-                              (FirebaseAuth.instance.currentUser != null
-                                  ? FirebaseAuth
-                                          .instance.currentUser!.displayName ??
-                                      "ANONYMOUS"
-                                  : "ANONYMOUS"),
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                            color: Colors.black,
-                          ),
-                        )
+                        // Text(
+                        //   "Welcome " +
+                        //       (FirebaseAuth.instance.currentUser != null
+                        //           ? FirebaseAuth
+                        //                   .instance.currentUser!.displayName ??
+                        //               "ANONYMOUS"
+                        //           : "ANONYMOUS"),
+                        //   style: TextStyle(
+                        //     fontWeight: FontWeight.bold,
+                        //     fontSize: 14,
+                        //     color: Colors.black,
+                        //   ),
+                        // )
                       ],
                     ),
                   ),
