@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutterprojectfinal/events/add_events/add_events.dart';
 import 'package:flutterprojectfinal/screens/auth/login/login_screen.dart';
 import 'package:flutterprojectfinal/screens/auth/signup/signup_screen.dart';
 import 'package:flutterprojectfinal/ui/homepage/page_render.dart';
@@ -17,11 +18,12 @@ void main() async {
           backgroundColor: Colors.purple,
           titleTextStyle: TextStyle(fontSize: 24, color: Colors.white)),
     ),
-    initialRoute: '/home',
+    initialRoute: '/addevent',
     routes: {
       '/': (context) => LoginScreen(),
       '/signup': (context) => SignUpScreen(),
-      '/home': (context) => PageRender()
+      '/home': (context) => PageRender(),
+      '/addevent': (context) => AddEventScreen()
     },
   ));
 }
