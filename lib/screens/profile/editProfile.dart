@@ -121,6 +121,7 @@ class _EditProfileState extends State<EditProfile> {
                 ),
                 TextButton(
                   onPressed: () async {
+                    Navigator.pop(context);
                     User? currentUser = FirebaseAuth.instance.currentUser;
                     if (currentUser != null) {
                       await currentUser.updateDisplayName(_newName);
@@ -132,7 +133,6 @@ class _EditProfileState extends State<EditProfile> {
                     setState(() {
                       _nameController.text = _newName;
                     });
-                    Navigator.pop(context);
                   },
                   child: Text('Save'),
                 ),
