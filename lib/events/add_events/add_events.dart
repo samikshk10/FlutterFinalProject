@@ -31,6 +31,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
   DateTime? _endDate;
   TimeOfDay? _startTime;
   TimeOfDay? _endTime;
+  bool isLoading = false;
 
   bool isOneDayEvent = true;
   List<String> dates = [];
@@ -53,6 +54,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
         .child('event_images/thumbnail/${fileName}');
     setState(() {
       uploadTask = ref.putFile(_selectedFile!);
+      isLoading = true;
     });
 
     // Upload the file to Firebase Storage
@@ -60,6 +62,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
     final snapshot = await uploadTask!.whenComplete(() {});
 
     final imageUrl = await snapshot.ref.getDownloadURL();
+
     print('Download link>>> $imageUrl');
     setState(() {
       uploadTask = null;
@@ -85,16 +88,24 @@ class _AddEventScreenState extends State<AddEventScreen> {
       // Add other fields as needed
     }).then((value) {
       // Show success message or navigate to another screen
+      setState(() {
+        isLoading = false;
+      });
+
+      FlashMessage.show(context,
+          message: "Event added successfully!", isSuccess: true);
       print("Event added successfully!");
     }).catchError((error) {
       // Show error message
+      FlashMessage.show(context,
+          message: "Error adding event please try again!");
       print("Failed to add event: $error");
     });
   }
 
-  Future<void> pickThumbnailImage() async {
+  Future<void> pickThumbnailImage(BuildContext context) async {
     try {
-      PlatformFile? pickedFile = await ETFilePicker.selectAnImage();
+      PlatformFile? pickedFile = await ETFilePicker.selectAnImage(context);
       if (pickedFile != null) {
         setState(() {
           _selectedFile = File(pickedFile.path!);
@@ -103,11 +114,11 @@ class _AddEventScreenState extends State<AddEventScreen> {
       } else {
         // User canceled image selection
 
-        FlashMessage(false, message: 'No image selected');
+        FlashMessage.show(context, message: "No image selected");
       }
     } catch (error) {
       // Handle any errors occurred during image selection
-      FlashMessage(false, message: error.toString());
+      FlashMessage.show(context, message: error.toString());
     }
   }
 
@@ -478,16 +489,18 @@ class _AddEventScreenState extends State<AddEventScreen> {
                       IconButton(
                         icon: Icon(Icons.attach_file),
                         onPressed: () async {
-                          pickThumbnailImage();
+                          pickThumbnailImage(context);
                         },
                       ),
                     ],
                   ),
+                  _buildProgress(),
                 ],
               ),
             ),
-            _buildProgress(),
-            CustomButton(label: 'Add Event', press: _addEvent),
+            isLoading
+                ? CircularProgressIndicator()
+                : CustomButton(label: 'Add Event', press: _addEvent),
           ],
         ),
       ),
