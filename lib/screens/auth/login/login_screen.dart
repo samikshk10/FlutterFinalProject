@@ -2,6 +2,7 @@ import 'package:ez_validator/ez_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojectfinal/screens/auth/forgotpassword/forgotpassword.dart';
+import 'package:flutterprojectfinal/screens/auth/signup/signup_screen.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/circuledButton.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/customButton.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/divider.dart';
@@ -142,12 +143,22 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               SizedBox(height: 32),
+              Text("Don't have an account?", style: TextStyle(fontSize: 20),),
+              CustomButton(
+                  label: 'SignUp',
+                  press: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => SignUpScreen()));
+                  }),
               Text('Or continue with:'),
               SizedBox(height: 10),
               GoogleSignInButton(
-                  onPressed: () {
-                    handleGoogleSignIn(context);
-                  },),
+                onPressed: () {
+                  handleGoogleSignIn(context);
+                },
+              ),
               SizedBox(height: 8),
               GestureDetector(
                 onTap: () {

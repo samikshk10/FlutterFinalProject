@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterprojectfinal/screens/profile/editProfile.dart';
 import 'package:flutterprojectfinal/utils/constant.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/customButton.dart';
 import 'package:flutterprojectfinal/utils/pickImage.dart';
@@ -17,16 +18,6 @@ class UserProfile extends StatefulWidget {
 
 class _UserProfileState extends State<UserProfile> {
   Uint8List? _image;
-  void _selectImage() async{
-    print('called');
-     Uint8List img = await pickImage(ImageSource.gallery);
-     setState(() {
-       _image = img;
-     });
-  }
-  void _saveProfile()async{
-    String resp = await StoreData().saveData(file: _image!);
-  }
   void _logout() async {
     try {
       await FirebaseAuth.instance.signOut();
@@ -62,7 +53,10 @@ class _UserProfileState extends State<UserProfile> {
                         : "ANONYMOUS"),
                     style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
                   ),
-                  IconButton(onPressed: _selectImage, icon: Icon(Icons.edit)),
+                  IconButton(onPressed: (){
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => EditProfile()));
+                  }, icon: Icon(Icons.edit)),
                 ],
               ),
             ),

@@ -133,11 +133,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
               ),
               SizedBox(height: 32),
-              GoogleSignInButton(
-                onPressed: () {
-                  // Implement Google Sign In
-                },
-              ),
               SizedBox(height: 32),
               CustomButton(
                 label: 'SignUp',
@@ -145,6 +140,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   if (_formKey.currentState!.validate()) {
                     print("here");
                     handleSignUP();
+                    Navigator.pop(context);
                   }
                 },
               ),
