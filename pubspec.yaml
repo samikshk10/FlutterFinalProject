@@ -47,8 +47,9 @@ dependencies:
   file_picker: ^8.0.0+1
   map_location_picker: ^1.2.8+3
   dio: ^5.4.3+1
-  firebase_storage: ^11.7.1
   fluttertoast: ^8.2.4
+  image_picker: ^1.0.8
+  firebase_storage: ^11.7.1
 
 dev_dependencies:
   flutter_test:
