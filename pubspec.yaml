@@ -42,6 +42,8 @@ dependencies:
   provider: ^6.1.2
   firebase_core: ^2.29.0
   toastification: ^1.2.1
+  image_picker: ^1.0.8
+  firebase_storage: ^11.7.1
   #fluttertoast: ^8.2.4
 
 dev_dependencies:

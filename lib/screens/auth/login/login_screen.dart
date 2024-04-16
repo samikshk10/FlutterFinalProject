@@ -142,11 +142,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               SizedBox(height: 32),
-              ElevatedButton(
+              Text('Or continue with:'),
+              SizedBox(height: 10),
+              GoogleSignInButton(
                   onPressed: () {
                     handleGoogleSignIn(context);
-                  },
-                  child: Text('Sign in with Google')),
+                  },),
               SizedBox(height: 8),
               GestureDetector(
                 onTap: () {

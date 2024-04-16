@@ -25,10 +25,10 @@ class GoogleSignInButton extends StatelessWidget {
               'assets/images/google-logo.png',
               height: 24.0,
             ),
-            SizedBox(width: 10),
+            SizedBox(width: 18),
             Expanded(
               child: Text(
-                'Google Sign In',
+                'Google',
                 style: TextStyle(fontSize: 16, color: Colors.black54),
               ),
             ),
