@@ -18,7 +18,7 @@ void main() async {
           backgroundColor: Colors.purple,
           titleTextStyle: TextStyle(fontSize: 24, color: Colors.white)),
     ),
-    initialRoute: '/addevent',
+    initialRoute: '/',
     routes: {
       '/': (context) => LoginScreen(),
       '/signup': (context) => SignUpScreen(),
