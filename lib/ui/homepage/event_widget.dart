@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutterprojectfinal/model/eventModel.dart';
 import '../../styleguide.dart';
 
-import '../../model/event.dart';
-
 class EventWidget extends StatelessWidget {
-  final Event event;
+  final EventModel event;
 
   const EventWidget({required Key key, required this.event}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    List<String> locations = event.location?.split(',') ?? [];
+
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 20),
       elevation: 4,
@@ -25,8 +26,8 @@ class EventWidget extends StatelessWidget {
               borderRadius: BorderRadius.all(
                 Radius.circular(30),
               ),
-              child: Image.asset(
-                event.imagePath,
+              child: Image.network(
+                event.imageUrl,
                 height: 150,
                 fit: BoxFit.fitWidth,
               ),
@@ -55,7 +56,9 @@ class EventWidget extends StatelessWidget {
                                 width: 5,
                               ),
                               Text(
-                                event.location,
+                                locations.length != 0
+                                    ? "${locations[1]},${locations[3]}"
+                                    : "not specified",
                                 style: eventLocationTextStyle,
                               ),
                             ],
@@ -67,7 +70,7 @@ class EventWidget extends StatelessWidget {
                   Expanded(
                     flex: 1,
                     child: Text(
-                      event.duration.toUpperCase(),
+                      "1D",
                       textAlign: TextAlign.right,
                       style: eventLocationTextStyle.copyWith(
                         fontWeight: FontWeight.w900,
