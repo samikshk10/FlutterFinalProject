@@ -1,16 +1,22 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ez_validator/ez_validator.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutterprojectfinal/app/configs/categoriesList.dart';
+import 'package:flutterprojectfinal/screens/widgets/location.dart';
+import 'package:geocoding/geocoding.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/formField.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/customButton.dart';
-import 'package:flutterprojectfinal/screens/customWidgets/loader.dart';
+
+import 'package:flutterprojectfinal/validators/eventsValidator.dart';
 import 'package:flutterprojectfinal/widgets/globalwidget/flashmessage.dart';
 import 'package:flutterprojectfinal/widgets/pickers/datetimepicker.dart';
 import 'package:flutterprojectfinal/widgets/pickers/file_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:dio/dio.dart' as Dio;
+
 import 'package:firebase_storage/firebase_storage.dart';
 
 class AddEventScreen extends StatefulWidget {
@@ -19,37 +25,76 @@ class AddEventScreen extends StatefulWidget {
 }
 
 class _AddEventScreenState extends State<AddEventScreen> {
+  final _formKey = GlobalKey<FormState>();
   File? _selectedFile;
   TextEditingController _titleController = TextEditingController();
   TextEditingController _descriptionController = TextEditingController();
   TextEditingController _locationController = TextEditingController();
-  TextEditingController _durationController = TextEditingController();
   TextEditingController _punchLine1Controller = TextEditingController();
-  TextEditingController _punchLine2Controller = TextEditingController();
   TextEditingController _filePickerController = TextEditingController();
+  bool _isOneDayEvent = false;
 
   DateTime? _startDate;
   DateTime? _endDate;
   TimeOfDay? _startTime;
   TimeOfDay? _endTime;
   bool isLoading = false;
+  String _dateErrorText = "";
+  String _timeErrorText = "";
 
-  bool isOneDayEvent = true;
   List<String> dates = [];
+  bool _isOnlineEvent = false; // Track if the event is online or offline
 
   UploadTask? uploadTask;
+  List<String> categories = CategoryList().categories;
+
+  String? _selectedCategory;
+  void _resetForm() {
+    _formKey.currentState?.reset();
+    _titleController.clear();
+    _descriptionController.clear();
+    _locationController.clear();
+    _punchLine1Controller.clear();
+    _filePickerController.clear();
+    _selectedFile = null;
+    _startDate = null;
+    _endDate = null;
+    _startTime = null;
+    _endTime = null;
+    _isOneDayEvent = false;
+    _isOnlineEvent = false;
+    _selectedCategory = null;
+    _dateErrorText = "";
+    _timeErrorText = "";
+  }
+
 // Inside the onPressed callback of your "Add Event" button
   void _addEvent() async {
-    // Check if an image is selected
-    if (_selectedFile == null) {
-      // Show an error message and return if no image is selected
-      print("Please select an image.");
+    bool dateError = false;
+    bool timeError = false;
+
+    if (_startDate.isNullOrEmpty || _endDate.isNullOrEmpty) {
+      setState(() {
+        dateError = true;
+      });
+    }
+
+    if (_startTime.isNullOrEmpty || _endTime.isNullOrEmpty) {
+      setState(() {
+        timeError = true;
+      });
+    }
+
+    if (dateError || timeError) {
+      setState(() {
+        _dateErrorText = dateError ? "Please select date" : "";
+        _timeErrorText = timeError ? "Please select time" : "";
+      });
       return;
     }
     String fileName =
         'event_image_${DateTime.now().millisecondsSinceEpoch}.jpg';
 
-    // Reference to the Firebase Storage bucket
     Reference ref = FirebaseStorage.instance
         .ref()
         .child('event_images/thumbnail/${fileName}');
@@ -59,7 +104,6 @@ class _AddEventScreenState extends State<AddEventScreen> {
     });
 
     // Upload the file to Firebase Storage
-
     final snapshot = await uploadTask!.whenComplete(() {});
 
     final imageUrl = await snapshot.ref.getDownloadURL();
@@ -78,29 +122,30 @@ class _AddEventScreenState extends State<AddEventScreen> {
       'title': _titleController.text,
       'description': _descriptionController.text,
       'location': _locationController.text,
-      'duration': _durationController.text,
-      'punchLine1': _punchLine1Controller.text,
-      'punchLine2': _punchLine2Controller.text,
+      'punchLine':
+          _punchLine1Controller.text != "" ? _punchLine1Controller.text : null,
       'startDate': _startDate != null ? _startDate!.toIso8601String() : null,
       'endDate': _endDate != null ? _endDate!.toIso8601String() : null,
       'startTime': _startTime != null ? _startTime!.format(context) : null,
       'endTime': _endTime != null ? _endTime!.format(context) : null,
-      'imageUrl': imageUrl, // Store the download URL of the image
-      // Add other fields as needed
+      'imageUrl': imageUrl,
+      'isOnlineEvent': _isOnlineEvent,
+      'category': _selectedCategory,
     }).then((value) {
       // Show success message or navigate to another screen
-      setState(() {
-        isLoading = false;
-      });
-
       FlashMessage.show(context,
           message: "Event added successfully!", isSuccess: true);
+      _resetForm();
       print("Event added successfully!");
     }).catchError((error) {
       // Show error message
       FlashMessage.show(context,
           message: "Error adding event please try again!");
       print("Failed to add event: $error");
+    }).whenComplete(() {
+      setState(() {
+        isLoading = false; // Set isLoading to false after completing the task
+      });
     });
   }
 
@@ -123,103 +168,66 @@ class _AddEventScreenState extends State<AddEventScreen> {
     }
   }
 
-  void pickDate(BuildContext context) async {
-    dates = isOneDayEvent
+  Future<List<String>> pickDate(BuildContext context) async {
+    dates = _isOneDayEvent
         ? await DateTimePicker.datePicker(context)
         : await DateTimePicker.dateRangePicker(context);
-    print("this is dates $dates");
+    return dates;
   }
 
-  Future<void> _selectStartDate(BuildContext context) async {
+  Future<List<String>> _selectTimeRange(BuildContext context) async {
     final ThemeData theme = Theme.of(context).copyWith(
       colorScheme: ColorScheme.fromSwatch(
         primarySwatch: Colors.deepPurple,
       ),
       dialogBackgroundColor: Colors.white,
     );
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: _startDate ?? DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2100),
-      builder: (BuildContext context, Widget? child) {
-        return Theme(data: theme, child: child!);
-      },
-    );
 
-    if (picked != null) {
-      setState(() {
-        _startDate = picked;
-      });
-    }
-  }
-
-  Future<void> _selectEndDate(BuildContext context) async {
-    final ThemeData theme = Theme.of(context).copyWith(
-      colorScheme: ColorScheme.fromSwatch(
-        primarySwatch: Colors.deepPurple,
-      ),
-      dialogBackgroundColor: Colors.white,
-    );
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: _endDate ?? DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2100),
-      builder: (BuildContext context, Widget? child) {
-        return Theme(data: theme, child: child!);
-      },
-    );
-
-    if (picked != null) {
-      setState(() {
-        _endDate = picked;
-      });
-    }
-  }
-
-  Future<void> _selectStartTime(BuildContext context) async {
-    final ThemeData theme = Theme.of(context).copyWith(
-      colorScheme: ColorScheme.fromSwatch(
-        primarySwatch: Colors.deepPurple,
-      ),
-      dialogBackgroundColor: Colors.white,
-    );
-    final TimeOfDay? picked = await showTimePicker(
+    TimeOfDay? startTime = await showTimePicker(
       context: context,
       initialTime: _startTime ?? TimeOfDay.now(),
       builder: (BuildContext context, Widget? child) {
-        return Theme(data: theme, child: child!);
+        return Theme(
+          data: theme,
+          child: Builder(
+            builder: (BuildContext context) {
+              return child!;
+            },
+          ),
+        );
       },
     );
 
-    if (picked != null) {
-      setState(() {
-        _startTime = picked;
-      });
-    }
-  }
+    if (startTime != null) {
+      TimeOfDay? endTime = await showTimePicker(
+        context: context,
+        initialTime: _endTime ?? TimeOfDay.now(),
+        builder: (BuildContext context, Widget? child) {
+          return Theme(
+            data: theme,
+            child: Builder(
+              builder: (BuildContext context) {
+                return child!;
+              },
+            ),
+          );
+        },
+      );
 
-  Future<void> _selectEndTime(BuildContext context) async {
-    final ThemeData theme = Theme.of(context).copyWith(
-      colorScheme: ColorScheme.fromSwatch(
-        primarySwatch: Colors.deepPurple,
-      ),
-      dialogBackgroundColor: Colors.white,
-    );
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: _endTime ?? TimeOfDay.now(),
-      builder: (BuildContext context, Widget? child) {
-        return Theme(data: theme, child: child!);
-      },
-    );
+      if (endTime != null) {
+        setState(() {
+          _startTime = startTime;
+          _endTime = endTime;
+        });
 
-    if (picked != null) {
-      setState(() {
-        _endTime = picked;
-      });
+        String startString = _startTime!.format(context);
+        String endString = _endTime!.format(context);
+
+        return [startString, endString];
+      }
     }
+
+    return [];
   }
 
   @override
@@ -230,279 +238,386 @@ class _AddEventScreenState extends State<AddEventScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Expanded(
-              child: ListView(
-                children: [
-                  SizedBox(height: 8),
-                  customFormField(
-                    controller: _titleController,
-                    type: TextInputType.text,
-                    validate: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Title cannot be empty';
-                      }
-                      return null;
-                    },
-                    label: 'Title',
-                    prefix: Icons.title,
-                  ),
-                  SizedBox(height: 16),
-                  customFormField(
-                    controller: _descriptionController,
-                    type: TextInputType.text,
-                    maxLines: 5,
-                    validate: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Description cannot be empty';
-                      }
-                      return null;
-                    },
-                    label: 'Description',
-                  ),
-                  SizedBox(height: 16),
-                  Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: customFormField(
-                              controller: _locationController,
-                              type: TextInputType.text,
-                              readonly: true,
-                              validate: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Location cannot be empty';
-                                }
-                                return null;
-                              },
-                              label: 'Location',
-                              prefix: Icons.location_on,
-                            ),
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.location_on),
-                            onPressed: () {
-                              // Add your location button functionality here
-                            },
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 16),
-                  customFormField(
-                    controller: _durationController,
-                    type: TextInputType.text,
-                    validate: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Duration cannot be empty';
-                      }
-                      return null;
-                    },
-                    label: 'Duration',
-                    prefix: Icons.access_time,
-                  ),
-                  SizedBox(height: 16),
-                  customFormField(
-                    controller: _punchLine1Controller,
-                    type: TextInputType.text,
-                    validate: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Punch Line 1 cannot be empty';
-                      }
-                      return null;
-                    },
-                    label: 'Punch Line 1',
-                    prefix: Icons.format_quote,
-                  ),
-                  SizedBox(height: 16),
-                  customFormField(
-                    controller: _punchLine2Controller,
-                    type: TextInputType.text,
-                    validate: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Punch Line 2 cannot be empty';
-                      }
-                      return null;
-                    },
-                    label: 'Punch Line 2',
-                    prefix: Icons.format_quote,
-                  ),
-                  SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          child: ListTile(
-                            title: const Text('Start Date'),
-                            subtitle: Text(_startDate != null
-                                ? DateFormat.yMd().format(_startDate!)
-                                : 'Not set'),
-                            leading: IconButton(
-                              icon: const Icon(
-                                Icons.calendar_today,
-                                color: Colors.deepPurple,
-                              ),
-                              onPressed: () => _selectStartDate(context),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Container(
-                          child: ListTile(
-                            title: const Text('End Date'),
-                            subtitle: Text(_endDate != null
-                                ? DateFormat.yMd().format(_endDate!)
-                                : 'Not set'),
-                            leading: IconButton(
-                              icon: const Icon(
-                                Icons.calendar_today,
-                                color: Colors.deepPurple,
-                              ),
-                              onPressed: () => _selectEndDate(context),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          child: ListTile(
-                            title: const Text('Start Time'),
-                            subtitle: Text(_startTime != null
-                                ? _startTime!.format(context)
-                                : 'Not set'),
-                            leading: IconButton(
-                              icon: const Icon(
-                                Icons.access_time,
-                                color: Colors.deepPurple,
-                              ),
-                              onPressed: () => _selectStartTime(context),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Container(
-                          child: ListTile(
-                            title: const Text('End Time'),
-                            subtitle: Text(_endTime != null
-                                ? _endTime!.format(context)
-                                : 'Not set'),
-                            leading: IconButton(
-                              icon: const Icon(
-                                Icons.access_time,
-                                color: Colors.deepPurple,
-                              ),
-                              onPressed: () => _selectEndTime(context),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 8),
-                  Stack(
-                    children: [
-                      _selectedFile != null
-                          ? Container(
-                              height: 200,
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                image: DecorationImage(
-                                  image: FileImage(_selectedFile!),
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            )
-                          : Container(
-                              height: 200,
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                image: DecorationImage(
-                                  image: Image.asset('assets/images/photo.png')
-                                      .image,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                      Positioned(
-                        top: 10,
-                        right: 10,
-                        child: Container(
-                          width: 36,
-                          height: 36,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(18),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.2),
-                                spreadRadius: 2,
-                                blurRadius: 3,
-                                offset: Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Center(
-                            child: IconButton(
-                              icon: Icon(Icons.clear),
-                              onPressed: () {
-                                setState(() {
-                                  _selectedFile = null;
-                                  _filePickerController.text =
-                                      ''; // Reset file path field
-                                });
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: customFormField(
-                          controller: _filePickerController,
-                          type: TextInputType.text,
-                          readonly: true,
-                          validate: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'File path cannot be empty';
-                            }
-                            return null;
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              Expanded(
+                child: ListView(
+                  children: [
+                    SizedBox(height: 8),
+                    customFormField(
+                      controller: _titleController,
+                      type: TextInputType.text,
+                      validate: (String? value) {
+                        final errors =
+                            eventSchema.catchErrors({"title": value});
+                        return errors["title"];
+                      },
+                      label: 'Title',
+                      prefix: Icons.title,
+                    ),
+                    SizedBox(height: 16),
+                    customFormField(
+                      controller: _descriptionController,
+                      type: TextInputType.text,
+                      maxLines: 5,
+                      validate: (String? value) {
+                        final errors =
+                            eventSchema.catchErrors({"description": value});
+                        return errors["description"];
+                      },
+                      label: 'Description',
+                    ),
+                    SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Text("Event Type: "),
+                        Container(
+                            padding: EdgeInsets.only(left: 20),
+                            child: Text('Online')),
+                        Radio(
+                          value: true,
+                          groupValue: _isOnlineEvent,
+                          onChanged: (value) {
+                            setState(() {
+                              _isOnlineEvent = value as bool;
+                            });
                           },
-                          label: 'Pick a thumbnail Image',
-                          prefix: Icons.attach_file,
                         ),
+                        Text('Offline'),
+                        Radio(
+                          value: false,
+                          groupValue: _isOnlineEvent,
+                          onChanged: (value) {
+                            setState(() {
+                              _isOnlineEvent = value as bool;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+
+                    // Dropdown for event categories
+                    DropdownButtonFormField<String>(
+                      value: _selectedCategory,
+                      onChanged: (String? value) {
+                        setState(() {
+                          _selectedCategory = value;
+                        });
+                      },
+                      items: categories.map((String category) {
+                        return DropdownMenuItem<String>(
+                          value: category,
+                          child: Text(category),
+                        );
+                      }).toList(),
+                      decoration: InputDecoration(
+                        labelText: 'Select Category',
+                        prefixIcon: Icon(Icons.category),
                       ),
-                      IconButton(
-                        icon: Icon(Icons.attach_file),
-                        onPressed: () async {
-                          pickThumbnailImage(context);
-                        },
-                      ),
-                    ],
-                  ),
-                  _buildProgress(),
-                ],
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please select a category';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 16),
+                    Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: customFormField(
+                                controller: _locationController,
+                                type: TextInputType.text,
+                                readonly: true,
+                                validate: (String? value) {
+                                  if (!_isOnlineEvent) {
+                                    final errors = eventSchema
+                                        .catchErrors({"location": value});
+                                    return errors["location"];
+                                  }
+                                  return null;
+                                },
+                                label: 'Location',
+                                prefix: Icons.location_on,
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.location_on),
+                              onPressed: () async {
+                                final result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => LocationFind()),
+                                ) as Map<String, double>?;
+
+                                if (result != null) {
+                                  double? latitude = result['lat'];
+                                  double? longitude = result['long'];
+                                  if (latitude != null && longitude != null) {
+                                    List<Placemark> placemarks =
+                                        await placemarkFromCoordinates(
+                                            latitude, longitude);
+                                    Placemark place = placemarks[0];
+
+                                    setState(() {
+                                      _locationController.text =
+                                          "${place.street}, ${place.subLocality}, ${place.administrativeArea},${place.subAdministrativeArea}, ${place.country}";
+                                    });
+                                  }
+                                } else {
+                                  print("location is not pick");
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 16),
+                    customFormField(
+                      controller: _punchLine1Controller,
+                      type: TextInputType.text,
+                      validate: (String? value) {
+                        return null;
+                      },
+                      label: 'Punch Line',
+                      prefix: Icons.format_quote,
+                    ),
+                    SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Text("Is it one day event"),
+                        Checkbox(
+                          value: _isOneDayEvent,
+                          onChanged: (newValue) {
+                            setState(() {
+                              _isOneDayEvent = newValue!;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            child: ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              title: const Text('Start Date'),
+                              subtitle: Text(_startDate != null
+                                  ? DateFormat.yMd().format(_startDate!)
+                                  : 'Not set'),
+                              leading: IconButton(
+                                icon: const Icon(
+                                  Icons.calendar_today,
+                                  color: Colors.deepPurple,
+                                ),
+                                onPressed: () async {
+                                  List<String> dates = await pickDate(context);
+                                  if (dates.length == 0) {
+                                    setState(() {
+                                      _dateErrorText = "Please select a date";
+                                    });
+                                  } else if (dates.length == 1) {
+                                    setState(() {
+                                      _startDate = DateTime.parse(dates[0]);
+                                      _endDate = DateTime.parse(dates[0]);
+                                      _dateErrorText = "";
+                                    });
+                                  } else {
+                                    setState(() {
+                                      _startDate = DateTime.parse(dates[0]);
+                                      _endDate = DateTime.parse(dates[1]);
+                                      _dateErrorText = "";
+                                    });
+                                  }
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Container(
+                            child: ListTile(
+                              title: const Text('End Date'),
+                              subtitle: Text(_endDate != null
+                                  ? DateFormat.yMd().format(_endDate!)
+                                  : 'Not set'),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    _dateErrorText != ""
+                        ? Text(
+                            _dateErrorText,
+                            style: TextStyle(color: Colors.red),
+                          )
+                        : Container(),
+
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            child: ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              title: const Text('Start Time'),
+                              subtitle: Text(_startTime != null
+                                  ? _startTime!.format(context)
+                                  : 'Not set'),
+                              leading: IconButton(
+                                  icon: const Icon(
+                                    Icons.access_time,
+                                    color: Colors.deepPurple,
+                                  ),
+                                  onPressed: () async {
+                                    List<String> timeRange =
+                                        await _selectTimeRange(context);
+                                    if (timeRange.length == 0) {
+                                      setState(() {
+                                        _timeErrorText = "Please select a time";
+                                      });
+                                    } else {
+                                      setState(() {
+                                        print("hello");
+                                        _timeErrorText = "";
+                                        _startTime = TimeOfDay.fromDateTime(
+                                            DateFormat.jm()
+                                                .parse(timeRange[0]));
+                                        _endTime = TimeOfDay.fromDateTime(
+                                            DateFormat.jm()
+                                                .parse(timeRange[1]));
+                                      });
+                                    }
+                                  }),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Container(
+                            child: ListTile(
+                              title: const Text('End Time'),
+                              subtitle: Text(_endTime != null
+                                  ? _endTime!.format(context)
+                                  : 'Not set'),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    _timeErrorText != ""
+                        ? Text(
+                            _timeErrorText,
+                            style: TextStyle(color: Colors.red),
+                          )
+                        : Container(),
+                    SizedBox(height: 8),
+                    Stack(
+                      children: [
+                        _selectedFile != null
+                            ? Container(
+                                height: 200,
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  image: DecorationImage(
+                                    image: FileImage(_selectedFile!),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              )
+                            : Container(
+                                height: 200,
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  image: DecorationImage(
+                                    image:
+                                        Image.asset('assets/images/photo.png')
+                                            .image,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                        Positioned(
+                          top: 10,
+                          right: 10,
+                          child: Container(
+                            width: 36,
+                            height: 36,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(18),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.2),
+                                  spreadRadius: 2,
+                                  blurRadius: 3,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Center(
+                              child: IconButton(
+                                icon: Icon(Icons.clear),
+                                onPressed: () {
+                                  setState(() {
+                                    _selectedFile = null;
+                                    _filePickerController.text =
+                                        ''; // Reset file path field
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: customFormField(
+                            controller: _filePickerController,
+                            type: TextInputType.text,
+                            readonly: true,
+                            validate: (String? value) {
+                              final errors =
+                                  eventSchema.catchErrors({"imageUrl": value});
+                              return errors["imageUrl"];
+                            },
+                            label: 'Pick a thumbnail Image',
+                            prefix: Icons.attach_file,
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.attach_file),
+                          onPressed: () async {
+                            pickThumbnailImage(context);
+                          },
+                        ),
+                      ],
+                    ),
+                    _buildProgress(),
+                  ],
+                ),
               ),
-            ),
-            isLoading
-                ? Loader()
-                : CustomButton(label: 'Add Event', press: _addEvent),
-          ],
+              isLoading
+                  ? CircularProgressIndicator()
+                  : CustomButton(
+                      label: 'Add Event',
+                      press: () {
+                        if (_formKey.currentState!.validate()) {
+                          _addEvent();
+                        }
+                      }),
+            ],
+          ),
         ),
       ),
     );
