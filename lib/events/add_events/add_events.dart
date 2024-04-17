@@ -49,6 +49,24 @@ class _AddEventScreenState extends State<AddEventScreen> {
   List<String> categories = CategoryList().categories;
 
   String? _selectedCategory;
+  void _resetForm() {
+    _formKey.currentState?.reset();
+    _titleController.clear();
+    _descriptionController.clear();
+    _locationController.clear();
+    _punchLine1Controller.clear();
+    _filePickerController.clear();
+    _selectedFile = null;
+    _startDate = null;
+    _endDate = null;
+    _startTime = null;
+    _endTime = null;
+    _isOneDayEvent = false;
+    _isOnlineEvent = false;
+    _selectedCategory = null;
+    _dateErrorText = "";
+    _timeErrorText = "";
+  }
 
 // Inside the onPressed callback of your "Add Event" button
   void _addEvent() async {
@@ -104,7 +122,8 @@ class _AddEventScreenState extends State<AddEventScreen> {
       'title': _titleController.text,
       'description': _descriptionController.text,
       'location': _locationController.text,
-      'punchLine': _punchLine1Controller.text,
+      'punchLine':
+          _punchLine1Controller.text != "" ? _punchLine1Controller.text : null,
       'startDate': _startDate != null ? _startDate!.toIso8601String() : null,
       'endDate': _endDate != null ? _endDate!.toIso8601String() : null,
       'startTime': _startTime != null ? _startTime!.format(context) : null,
@@ -116,6 +135,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
       // Show success message or navigate to another screen
       FlashMessage.show(context,
           message: "Event added successfully!", isSuccess: true);
+      _resetForm();
       print("Event added successfully!");
     }).catchError((error) {
       // Show error message
@@ -315,9 +335,12 @@ class _AddEventScreenState extends State<AddEventScreen> {
                                 type: TextInputType.text,
                                 readonly: true,
                                 validate: (String? value) {
-                                  final errors = eventSchema
-                                      .catchErrors({"location": value});
-                                  return errors["location"];
+                                  if (!_isOnlineEvent) {
+                                    final errors = eventSchema
+                                        .catchErrors({"location": value});
+                                    return errors["location"];
+                                  }
+                                  return null;
                                 },
                                 label: 'Location',
                                 prefix: Icons.location_on,
@@ -360,9 +383,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
                       controller: _punchLine1Controller,
                       type: TextInputType.text,
                       validate: (String? value) {
-                        final errors =
-                            eventSchema.catchErrors({"punchLine": value});
-                        return errors["punchLine"];
+                        return null;
                       },
                       label: 'Punch Line',
                       prefix: Icons.format_quote,
@@ -464,13 +485,13 @@ class _AddEventScreenState extends State<AddEventScreen> {
                                     } else {
                                       setState(() {
                                         print("hello");
+                                        _timeErrorText = "";
                                         _startTime = TimeOfDay.fromDateTime(
                                             DateFormat.jm()
                                                 .parse(timeRange[0]));
                                         _endTime = TimeOfDay.fromDateTime(
                                             DateFormat.jm()
                                                 .parse(timeRange[1]));
-                                        _timeErrorText = "";
                                       });
                                     }
                                   }),

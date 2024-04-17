@@ -13,5 +13,4 @@ final EzSchema eventSchema = EzSchema.shape({
   "endTime": EzValidator<TimeOfDay>().required(),
   "category": EzValidator<String>().required(),
   "imageUrl": EzValidator<String>().required(),
-  "punchLine": EzValidator<String>().required(),
 });
