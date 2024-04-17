@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/formField.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/customButton.dart';
+import 'package:flutterprojectfinal/screens/customWidgets/loader.dart';
 import 'package:flutterprojectfinal/widgets/globalwidget/flashmessage.dart';
 import 'package:flutterprojectfinal/widgets/pickers/datetimepicker.dart';
 import 'package:flutterprojectfinal/widgets/pickers/file_picker.dart';
@@ -499,7 +500,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
               ),
             ),
             isLoading
-                ? CircularProgressIndicator()
+                ? Loader()
                 : CustomButton(label: 'Add Event', press: _addEvent),
           ],
         ),
