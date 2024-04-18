@@ -35,7 +35,7 @@ class CardPopularEvent extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           child: Stack(
             children: [
-              Image.network(
+              Image.asset(
                 eventModel.imagePath,
                 fit: BoxFit.cover,
                 width: double.infinity,

@@ -6,26 +6,33 @@ Widget customFormField({
   bool isPassword = false,
   required String? Function(String?) validate,
   required String label,
-  required IconData prefix,
+  IconData? prefix,
+  bool readonly = false,
   String? errorText,
   IconData? suffix,
+  int? maxLines,
   Function()? suffixPressed,
 }) =>
     TextFormField(
       controller: controller,
       keyboardType: type,
-      obscureText: isPassword,
+      obscureText: isPassword && maxLines == 1, // Only obscure if single line
       validator: validate,
+      readOnly: readonly,
+      maxLines: maxLines,
       decoration: InputDecoration(
         errorText: errorText,
         filled: true,
         fillColor: Colors.white,
         contentPadding: const EdgeInsets.all(18),
         labelText: label,
-        prefixIcon: Icon(
-          prefix,
-          color: Color(0xFFD4D4D4),
-        ),
+        prefixIcon: prefix != null
+            ? Icon(
+                prefix,
+                color: Color(0xFFD4D4D4),
+              )
+            : null,
+        enabled: !readonly,
         suffixIcon: suffix != null
             ? IconButton(
                 onPressed: suffixPressed,

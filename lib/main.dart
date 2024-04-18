@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutterprojectfinal/events/add_events/add_events.dart';
 import 'package:flutterprojectfinal/screens/auth/login/login_screen.dart';
 import 'package:flutterprojectfinal/screens/auth/signup/signup_screen.dart';
 import 'package:flutterprojectfinal/ui/homepage/page_render.dart';
@@ -21,7 +22,8 @@ void main() async {
     routes: {
       '/': (context) => LoginScreen(),
       '/signup': (context) => SignUpScreen(),
-      '/home': (context) => PageRender()
+      '/home': (context) => PageRender(),
+      '/addevent': (context) => AddEventScreen()
     },
   ));
 }

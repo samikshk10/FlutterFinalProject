@@ -50,7 +50,8 @@ class EventDetailsContent extends StatelessWidget {
                   ),
                   Text(
                     event.location,
-                    style: eventLocationTextStyle.copyWith(color: Colors.white, fontWeight: FontWeight.w700),
+                    style: eventLocationTextStyle.copyWith(
+                        color: Colors.white, fontWeight: FontWeight.w700),
                   ),
                 ],
               ),
@@ -88,32 +89,42 @@ class EventDetailsContent extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(16),
             child: RichText(
-              text: TextSpan(
-                children: [
-                  TextSpan(text: event.punchLine1, style: punchLine1TextStyle,),
-                  TextSpan(text: event.punchLine2, style: punchLine2TextStyle,),
-                ]
+              text: TextSpan(children: [
+                TextSpan(
+                  text: event.punchLine1,
+                  style: punchLine1TextStyle,
+                ),
+                TextSpan(
+                  text: event.punchLine2,
+                  style: punchLine2TextStyle,
+                ),
+              ]),
+            ),
+          ),
+          if (event.description.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                event.description,
+                style: eventLocationTextStyle,
               ),
             ),
-          ),
-          if (event.description.isNotEmpty) Padding(
-            padding: const EdgeInsets.all(16),
-            child: Text(event.description, style: eventLocationTextStyle,),
-          ),
-          if (event.galleryImages.isNotEmpty) Padding(
-            padding: const EdgeInsets.only(left: 16.0, top: 16, bottom: 16),
-            child: Text(
-              "GALLERY",
-              style: guestTextStyle,
+          if (event.galleryImages.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(left: 16.0, top: 16, bottom: 16),
+              child: Text(
+                "GALLERY",
+                style: guestTextStyle,
+              ),
             ),
-          ),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
               children: <Widget>[
                 for (final galleryImagePath in event.galleryImages)
                   Container(
-                    margin: const EdgeInsets.only(left: 16, right: 16, bottom: 32),
+                    margin:
+                        const EdgeInsets.only(left: 16, right: 16, bottom: 32),
                     child: ClipRRect(
                       borderRadius: BorderRadius.all(Radius.circular(20)),
                       child: Image.asset(

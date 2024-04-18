@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutterprojectfinal/events/add_events/add_events.dart';
 import 'package:flutterprojectfinal/screens/auth/login/login_screen.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/navbar.dart';
 import 'package:flutterprojectfinal/screens/explore/explorePage.dart';
@@ -16,7 +17,7 @@ class _PageRenderState extends State<PageRender> {
   final List<Widget> _pages = [
     HomePage(),
     ExplorePage(),
-    LoginScreen(),
+    AddEventScreen(),
     UserProfile()
   ];
 

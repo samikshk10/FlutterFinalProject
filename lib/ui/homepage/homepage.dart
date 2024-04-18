@@ -1,31 +1,51 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterprojectfinal/app_state.dart';
+import 'package:flutterprojectfinal/model/event.dart';
+import 'package:flutterprojectfinal/model/eventModel.dart';
 import 'package:flutterprojectfinal/screens/widgets/cardPopularEvents.dart';
-import '../../model/category.dart';
-import '../../model/event.dart';
-import '../../styleguide.dart';
-import '../../ui/event_details/event_details_page.dart';
+import 'package:flutterprojectfinal/ui/event_details/event_details_page.dart';
+import 'package:flutterprojectfinal/ui/homepage/category_widget.dart';
+import 'package:flutterprojectfinal/ui/homepage/event_widget.dart';
+
 import 'package:provider/provider.dart';
 
 import '../../app_state.dart';
 import 'category_widget.dart';
 import 'event_widget.dart';
 import 'package:flutterprojectfinal/app/configs/colors.dart';
+import '../../model/category.dart';
+import '../../styleguide.dart';
+import '../../app/configs/colors.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  Future<List<Event>> _fetchEvents() async {
-    // Simulate a network delay
-    await Future.delayed(Duration(seconds: 2));
+  @override
+  void initState() {
+    super.initState();
+  }
 
-    // Return the list of events
+  Future<List<Event>> _fetchPopularEvents() async {
+    await Future.delayed(Duration(seconds: 2));
     return events;
+  }
+
+  List<EventModel> eventAll = [];
+
+  Future<List<EventModel>> _fetchEvents() async {
+    // eventAll.clear();
+    QuerySnapshot querySnapshot =
+        await FirebaseFirestore.instance.collection('events').get();
+    querySnapshot.docs.forEach((doc) {
+      eventAll.add(EventModel.fromFirestore(doc));
+    });
+    return eventAll;
   }
 
   @override
@@ -51,19 +71,19 @@ class _HomePageState extends State<HomePage> {
                           style: fadedTextStyle,
                         ),
                         Spacer(),
-                        Text(
-                          "Welcome " +
-                              (FirebaseAuth.instance.currentUser != null
-                                  ? FirebaseAuth
-                                          .instance.currentUser!.displayName ??
-                                      "ANONYMOUS"
-                                  : "ANONYMOUS"),
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                            color: Colors.black,
-                          ),
-                        )
+                        // Text(
+                        //   "Welcome " +
+                        //       (FirebaseAuth.instance.currentUser != null
+                        //           ? FirebaseAuth
+                        //                   .instance.currentUser!.displayName ??
+                        //               "ANONYMOUS"
+                        //           : "ANONYMOUS"),
+                        //   style: TextStyle(
+                        //     fontWeight: FontWeight.bold,
+                        //     fontSize: 14,
+                        //     color: Colors.black,
+                        //   ),
+                        // )
                       ],
                     ),
                   ),
@@ -116,6 +136,22 @@ class _HomePageState extends State<HomePage> {
                   ),
                   const SizedBox(height: 16),
                   FutureBuilder<List<Event>>(
+                    future: _fetchPopularEvents(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text(snapshot.error.toString()));
+                      } else if (snapshot.hasData) {
+                        List<Event> events = snapshot.data as List<Event>;
+                        return _listPopularEvent(events);
+                      } else {
+                        return const Center(child: Text("No events found."));
+                      }
+                    },
+                  ),
+                  // FutureBuilder for fetching events
+                  FutureBuilder<List<EventModel>>(
                     future: _fetchEvents(),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
@@ -123,41 +159,35 @@ class _HomePageState extends State<HomePage> {
                       } else if (snapshot.hasError) {
                         return Center(child: Text(snapshot.error.toString()));
                       } else if (snapshot.hasData) {
-                        final events = snapshot.data!;
-                        return _listPopularEvent(events);
+                        List<EventModel> events =
+                            snapshot.data as List<EventModel>;
+                        return Column(
+                          children: events.map((event) {
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => EventDetailsPage(
+                                      key: Key('event_details'),
+                                      event: event,
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: EventWidget(
+                                key: Key('event_widget_${event.title}'),
+                                event: event,
+                              ),
+                            );
+                          }).toList(),
+                        );
                       } else {
                         return const Center(child: Text("No events found."));
                       }
                     },
                   ),
-                  const SizedBox(height: 24),
 
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Consumer<AppState>(
-                      builder: (context, appState, _) => Column(
-                        children: <Widget>[
-                          for (final event in events.where((e) => e.categoryIds
-                              .contains(appState.selectedCategoryId)))
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) => EventDetailsPage(
-                                        key: Key('event_details'),
-                                        event: event),
-                                  ),
-                                );
-                              },
-                              child: EventWidget(
-                                key: Key('event_widget'),
-                                event: event,
-                              ),
-                            )
-                        ],
-                      ),
-                    ),
-                  ),
+                  // Other widgets
                 ],
               ),
             ),
@@ -186,6 +216,7 @@ Widget _buildSearch() => Container(
         ),
       ),
     );
+
 Widget _listPopularEvent(List<Event> events) => Container(
       width: double.infinity, // or set a specific width
       height: 270,

@@ -7,21 +7,22 @@ class Event {
       punchLine1,
       date,
       punchLine2;
-
+  final double longitude, latitude;
   final List categoryIds, galleryImages;
 
-  Event({
-    required this.imagePath,
-    required this.title,
-    required this.description,
-    required this.location,
-    required this.duration,
-    required this.punchLine1,
-    required this.punchLine2,
-    required this.categoryIds,
-    required this.galleryImages,
-    required this.date,
-  });
+  Event(
+      {required this.imagePath,
+      required this.title,
+      required this.description,
+      required this.location,
+      required this.duration,
+      required this.punchLine1,
+      required this.punchLine2,
+      required this.categoryIds,
+      required this.galleryImages,
+      required this.date,
+      required this.longitude,
+      required this.latitude});
 }
 
 final fiveKmRunEvent = Event(
@@ -34,7 +35,9 @@ final fiveKmRunEvent = Event(
     punchLine2: "The latest fad in foodology, get the inside scoup.",
     galleryImages: [],
     categoryIds: [0, 1],
-    date: "12 Apr, 2021");
+    date: "12 Apr, 2021",
+    longitude: 12.2,
+    latitude: 12.5);
 
 final cookingEvent = Event(
     imagePath: "assets/event_images/granite_cooking_class.jpeg",
@@ -51,7 +54,9 @@ final cookingEvent = Event(
       "assets/event_images/cooking_2.jpeg",
       "assets/event_images/cooking_3.jpeg"
     ],
-    date: "12 Apr, 2021");
+    date: "12 Apr, 2021",
+    longitude: 123.5,
+    latitude: 123.5);
 
 final musicConcert = Event(
     imagePath: "assets/event_images/music_concert.jpeg",
@@ -67,7 +72,9 @@ final musicConcert = Event(
       "assets/event_images/cooking_3.jpeg"
     ],
     categoryIds: [0, 1],
-    date: "12 Apr, 2021");
+    date: "12 Apr, 2021",
+    longitude: 123.5,
+    latitude: 123.5);
 
 final golfCompetition = Event(
     imagePath: "assets/event_images/golf_competition.jpeg",
@@ -83,7 +90,9 @@ final golfCompetition = Event(
       "assets/event_images/cooking_3.jpeg"
     ],
     categoryIds: [0, 3],
-    date: "12 Apr, 2021");
+    date: "12 Apr, 2021",
+    longitude: 123.5,
+    latitude: 123.5);
 
 final events = [
   fiveKmRunEvent,
