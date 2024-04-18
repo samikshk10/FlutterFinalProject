@@ -10,6 +10,10 @@ import 'package:flutterprojectfinal/ui/homepage/event_widget.dart';
 
 import 'package:provider/provider.dart';
 
+import '../../app_state.dart';
+import 'category_widget.dart';
+import 'event_widget.dart';
+import 'package:flutterprojectfinal/app/configs/colors.dart';
 import '../../model/category.dart';
 import '../../styleguide.dart';
 import '../../app/configs/colors.dart';
