@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutterprojectfinal/screens/auth/login/login_screen.dart';
-import 'package:flutterprojectfinal/screens/auth/signup/signup_screen.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/navbar.dart';
+import 'package:flutterprojectfinal/screens/explore/explorePage.dart';
 import 'package:flutterprojectfinal/ui/homepage/homepage.dart';
 import 'package:flutterprojectfinal/screens/profile/userProfile.dart';
 
@@ -15,7 +15,7 @@ class _PageRenderState extends State<PageRender> {
 
   final List<Widget> _pages = [
     HomePage(),
-    SignUpScreen(),
+    ExplorePage(),
     LoginScreen(),
     UserProfile()
   ];

@@ -1,11 +1,8 @@
-import 'package:ez_validator/ez_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojectfinal/screens/auth/forgotpassword/forgotpassword.dart';
 import 'package:flutterprojectfinal/screens/auth/signup/signup_screen.dart';
-import 'package:flutterprojectfinal/screens/customWidgets/circuledButton.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/customButton.dart';
-import 'package:flutterprojectfinal/screens/customWidgets/divider.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/formField.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/googleSignInButton.dart';
 import 'package:flutterprojectfinal/services/auth.dart';

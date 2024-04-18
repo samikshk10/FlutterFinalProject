@@ -10,7 +10,6 @@ import 'package:provider/provider.dart';
 import '../../app_state.dart';
 import 'category_widget.dart';
 import 'event_widget.dart';
-import 'home_page_background.dart';
 import 'package:flutterprojectfinal/app/configs/colors.dart';
 
 class HomePage extends StatefulWidget {
