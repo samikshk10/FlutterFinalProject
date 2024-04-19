@@ -7,6 +7,8 @@ import 'package:flutterprojectfinal/screens/widgets/cardPopularEvents.dart';
 import 'package:flutterprojectfinal/ui/event_details/event_details_page.dart';
 import 'package:flutterprojectfinal/ui/homepage/category_widget.dart';
 import 'package:flutterprojectfinal/ui/homepage/event_widget.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 
 import 'package:provider/provider.dart';
 
@@ -36,16 +38,65 @@ class _HomePageState extends State<HomePage> {
     return events;
   }
 
-  List<EventModel> eventAll = [];
+  List<EventModel> LocalEvents = [];
+
+  Future<Placemark> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Test if location services are enabled.
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      // Location services are not enabled don't continue
+      // accessing the position and request users of the
+      // App to enable the location services.
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        // Permissions are denied, next time you could try
+        // requesting permissions again (this is also where
+        // Android's shouldShowRequestPermissionRationale
+        // returned true. According to Android guidelines
+        // your App should show an explanatory UI now.
+        return Future.error('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      // Permissions are denied forever, handle appropriately.
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+
+    // When we reach here, permissions are granted and we can
+    // continue accessing the position of the device.
+    Position coordinates = await Geolocator.getCurrentPosition();
+    List<Placemark> placemarks = await placemarkFromCoordinates(
+        coordinates.latitude, coordinates.longitude);
+    Placemark place = placemarks[0];
+
+    return place;
+  }
 
   Future<List<EventModel>> _fetchEvents() async {
-    // eventAll.clear();
+    LocalEvents.clear();
     QuerySnapshot querySnapshot =
         await FirebaseFirestore.instance.collection('events').get();
+    Placemark place = await _determinePosition();
+    print("postion  $place.subAdministrativeArea");
+
     querySnapshot.docs.forEach((doc) {
-      eventAll.add(EventModel.fromFirestore(doc));
+      var eventData = EventModel.fromFirestore(doc);
+      List<String> locations = eventData.location!.split(",");
+      if (locations[3].trim() == place.subAdministrativeArea.toString())
+        LocalEvents.add(EventModel.fromFirestore(doc));
     });
-    return eventAll;
+
+    return LocalEvents;
   }
 
   @override
@@ -135,6 +186,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   const SizedBox(height: 16),
+
                   FutureBuilder<List<Event>>(
                     future: _fetchPopularEvents(),
                     builder: (context, snapshot) {
@@ -149,6 +201,30 @@ class _HomePageState extends State<HomePage> {
                         return const Center(child: Text("No events found."));
                       }
                     },
+                  ),
+                  const SizedBox(height: 16),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: const [
+                        Text(
+                          "Local Events",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                        ),
+                        Text(
+                          "View All",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w400,
+                            fontSize: 12,
+                            color: AppColors.greyTextColor,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                   // FutureBuilder for fetching events
                   FutureBuilder<List<EventModel>>(
