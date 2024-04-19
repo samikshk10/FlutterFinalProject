@@ -2,30 +2,25 @@ import 'dart:typed_data';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterprojectfinal/screens/profile/editProfile.dart';
 import 'package:flutterprojectfinal/utils/constant.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/customButton.dart';
-import 'package:flutterprojectfinal/utils/pickImage.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:flutterprojectfinal/resourcecs/add_data.dart';
 
 class UserProfile extends StatefulWidget {
   const UserProfile({super.key});
-
   @override
   State<UserProfile> createState() => _UserProfileState();
 }
 
 class _UserProfileState extends State<UserProfile> {
   Uint8List? _image;
-  void _selectImage() async{
-    print('called');
-     Uint8List img = await pickImage(ImageSource.gallery);
-     setState(() {
-       _image = img;
-     });
-  }
-  void _saveProfile()async{
-    String resp = await StoreData().saveData(file: _image!);
+  String? displayName = FirebaseAuth.instance.currentUser?.displayName;
+  void didUpdateWidget(UserProfile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    setState(() {
+      displayName = FirebaseAuth.instance.currentUser?.displayName;
+    });
+    print('First Screen is visible again');
   }
   void _logout() async {
     try {
@@ -57,12 +52,15 @@ class _UserProfileState extends State<UserProfile> {
                   SizedBox(width: 100,),
                   Text(
                     (FirebaseAuth.instance.currentUser != null
-                        ? FirebaseAuth.instance.currentUser!.displayName ??
+                        ?displayName ??
                         "ANONYMOUS"
                         : "ANONYMOUS"),
                     style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
                   ),
-                  IconButton(onPressed: _selectImage, icon: Icon(Icons.edit)),
+                  IconButton(onPressed: (){
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => EditProfile()));
+                  }, icon: Icon(Icons.edit)),
                 ],
               ),
             ),

@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutterprojectfinal/screens/customWidgets/circuledButton.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/customButton.dart';
-import 'package:flutterprojectfinal/screens/customWidgets/divider.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/formField.dart';
-import 'package:flutterprojectfinal/screens/customWidgets/googleSignInButton.dart';
 import 'package:flutterprojectfinal/services/auth.dart';
 import 'package:flutterprojectfinal/utils/constant.dart';
 import 'package:flutterprojectfinal/validators/authValidators.dart';
@@ -133,11 +130,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
               ),
               SizedBox(height: 32),
-              GoogleSignInButton(
-                onPressed: () {
-                  // Implement Google Sign In
-                },
-              ),
               SizedBox(height: 32),
               CustomButton(
                 label: 'SignUp',
@@ -145,6 +137,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   if (_formKey.currentState!.validate()) {
                     print("here");
                     handleSignUP();
+                    Navigator.pop(context);
                   }
                 },
               ),

@@ -28,7 +28,7 @@ class MyNavigationBar extends StatelessWidget {
           label: "Home",
         ),
         NavigationDestination(
-          icon: Icon(Icons.person),
+          icon: Icon(Icons.search),
           label: "User",
         ),
         NavigationDestination(icon: Icon(Icons.event), label: "Event"),
