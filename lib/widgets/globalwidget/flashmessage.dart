@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:toastification/toastification.dart';
 
 class FlashMessage {
   static void show(BuildContext context,
       {required String message, bool isSuccess = false}) {
-    Fluttertoast.showToast(
-      msg: message,
-      toastLength: Toast.LENGTH_LONG,
-      gravity: ToastGravity.TOP,
-      timeInSecForIosWeb: 3,
-      backgroundColor: isSuccess ? Colors.blue[300]! : Colors.redAccent,
-      textColor: Colors.white,
+    toastification.show(
+      context: context,
+      title: Text(message),
+      foregroundColor: Colors.white,
+      backgroundColor: !isSuccess ? Colors.redAccent : Colors.blue[300]!,
+      autoCloseDuration: const Duration(seconds: 5),
     );
   }
 }

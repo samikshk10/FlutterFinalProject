@@ -23,7 +23,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  bool isPasswordVisible = true;
+  bool isPassword = true;
   String emailError = "";
   String passwordError = "";
   final _formKey = GlobalKey<FormState>();
@@ -120,13 +120,14 @@ class _LoginScreenState extends State<LoginScreen> {
                         controller: _passwordController,
                         label: 'Password',
                         prefix: Icons.lock,
-                        isPassword: isPasswordVisible,
-                        suffix: isPasswordVisible
-                            ? Icons.visibility
-                            : Icons.visibility_off,
+                        maxLines: 1,
+                        isPassword: isPassword,
+                        suffix: isPassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
                         suffixPressed: () {
                           setState(() {
-                            isPasswordVisible = !isPasswordVisible;
+                            isPassword = !isPassword;
                           });
                         },
                         type: TextInputType.visiblePassword,
@@ -145,9 +146,10 @@ class _LoginScreenState extends State<LoginScreen> {
               Text('Or continue with:'),
               SizedBox(height: 10),
               GoogleSignInButton(
-                  onPressed: () {
-                    handleGoogleSignIn(context);
-                  },),
+                onPressed: () {
+                  handleGoogleSignIn(context);
+                },
+              ),
               SizedBox(height: 8),
               GestureDetector(
                 onTap: () {

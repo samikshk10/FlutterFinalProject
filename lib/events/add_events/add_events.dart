@@ -34,6 +34,8 @@ class _AddEventScreenState extends State<AddEventScreen> {
   TextEditingController _filePickerController = TextEditingController();
   bool _isOneDayEvent = false;
 
+  String EventDuration = "";
+
   DateTime? _startDate;
   DateTime? _endDate;
   TimeOfDay? _startTime;
@@ -42,6 +44,8 @@ class _AddEventScreenState extends State<AddEventScreen> {
   String _dateErrorText = "";
   String _timeErrorText = "";
 
+  double? _longitude, _latitude;
+
   List<String> dates = [];
   bool _isOnlineEvent = false; // Track if the event is online or offline
 
@@ -49,6 +53,40 @@ class _AddEventScreenState extends State<AddEventScreen> {
   List<String> categories = CategoryList().categories;
 
   String? _selectedCategory;
+  String calculateEventDuration(DateTime? startDate, DateTime? endDate,
+      TimeOfDay? startTime, TimeOfDay? endTime) {
+    if (startDate == null ||
+        endDate == null ||
+        startTime == null ||
+        endTime == null) {
+      return ''; // Return empty string if any of the values are null
+    }
+
+    // Calculate the difference in days and hours between start and end date times
+    final difference = endDate.difference(startDate).inHours +
+        endTime.hour -
+        startTime.hour -
+        (endDate.hour - startDate.hour) * 24;
+
+    // Calculate days and hours
+    final days = difference ~/ 24;
+    final hours = difference % 24;
+
+    // Build the duration string
+    String duration = '';
+    if (days > 0) {
+      duration += '$days d';
+    }
+    if (hours > 0) {
+      if (duration.isNotEmpty) {
+        duration += ' ';
+      }
+      duration += '$hours h';
+    }
+
+    return duration;
+  }
+
   void _resetForm() {
     _formKey.currentState?.reset();
     _titleController.clear();
@@ -117,11 +155,15 @@ class _AddEventScreenState extends State<AddEventScreen> {
     CollectionReference events =
         FirebaseFirestore.instance.collection('events');
 
+    String _eventDuration =
+        calculateEventDuration(_startDate, _endDate, _startTime, _endTime);
+
     // Add the event data to Firestore
     events.add({
       'title': _titleController.text,
       'description': _descriptionController.text,
       'location': _locationController.text,
+      'duration': _eventDuration,
       'punchLine':
           _punchLine1Controller.text != "" ? _punchLine1Controller.text : null,
       'startDate': _startDate != null ? _startDate!.toIso8601String() : null,
@@ -131,6 +173,8 @@ class _AddEventScreenState extends State<AddEventScreen> {
       'imageUrl': imageUrl,
       'isOnlineEvent': _isOnlineEvent,
       'category': _selectedCategory,
+      'longitude': _longitude.isNullOrEmpty ? null : _longitude,
+      'latitude': _latitude.isNullOrEmpty ? null : _latitude
     }).then((value) {
       // Show success message or navigate to another screen
       FlashMessage.show(context,
@@ -356,17 +400,17 @@ class _AddEventScreenState extends State<AddEventScreen> {
                                 ) as Map<String, double>?;
 
                                 if (result != null) {
-                                  double? latitude = result['lat'];
-                                  double? longitude = result['long'];
-                                  if (latitude != null && longitude != null) {
+                                  _latitude = result['lat'];
+                                  _longitude = result['long'];
+                                  if (_latitude != null && _longitude != null) {
                                     List<Placemark> placemarks =
                                         await placemarkFromCoordinates(
-                                            latitude, longitude);
+                                            _latitude ?? 0, _longitude ?? 0);
                                     Placemark place = placemarks[0];
 
                                     setState(() {
                                       _locationController.text =
-                                          "${place.street}, ${place.subLocality}, ${place.administrativeArea},${place.subAdministrativeArea}, ${place.country}";
+                                          "${place.street ?? "n/a"}, ${place.subLocality ?? "n/a"}, ${place.administrativeArea ?? "n/a"},${place.subAdministrativeArea ?? "n/a"}, ${place.country ?? "n/a"}";
                                     });
                                   }
                                 } else {
