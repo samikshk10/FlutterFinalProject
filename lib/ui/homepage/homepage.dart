@@ -88,7 +88,7 @@ class _HomePageState extends State<HomePage> {
     querySnapshot.docs.forEach((doc) {
       var eventData = EventModel.fromFirestore(doc);
       List<String> locations = eventData.location!.split(",");
-      if (locations[3].trim() == place.subAdministrativeArea.toString() || locations[2].trim()== place.administrativeArea.toString)
+      if (locations[3].trim() == place.subAdministrativeArea.toString())
         LocalEvents.add(EventModel.fromFirestore(doc));
     });
 
