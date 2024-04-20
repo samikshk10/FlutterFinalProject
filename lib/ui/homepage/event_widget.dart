@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutterprojectfinal/model/event.dart';
 import 'package:flutterprojectfinal/model/eventModel.dart';
+import 'package:flutterprojectfinal/services/provider/favouriteProvider.dart';
+import 'package:provider/provider.dart';
 import '../../styleguide.dart';
 
 class EventWidget extends StatelessWidget {
@@ -9,6 +12,8 @@ class EventWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<FavouriteProvider>(context);
+    final Event eventModel;
     List<String> locations = event.location?.split(',') ?? [];
 
     return Card(
@@ -76,7 +81,21 @@ class EventWidget extends StatelessWidget {
                         fontWeight: FontWeight.w900,
                       ),
                     ),
-                  ),
+                  )
+                  /*IconButton(
+                    onPressed: () {
+                      provider.toggleFavourite(widget.eventModel);
+                      provider.addFavourite(widget.eventModel);
+                    },
+                    icon: Icon(
+                      provider.isExist(widget.eventModel)
+                          ? Icons.favorite
+                          : Icons.favorite_border,
+                      color: provider.isExist(widget.eventModel)
+                          ? Colors.red
+                          : null,
+                    ),
+                  ),*/
                 ],
               ),
             ),

@@ -19,6 +19,7 @@ import 'package:flutterprojectfinal/app/configs/colors.dart';
 import '../../model/category.dart';
 import '../../styleguide.dart';
 import '../../app/configs/colors.dart';
+import 'package:flutterprojectfinal/screens/profile/favouritePage.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -105,6 +106,21 @@ class _HomePageState extends State<HomePage> {
       create: (_) => AppState(),
       child: Stack(
         children: <Widget>[
+          /*Positioned(
+            bottom: 16,
+            right: 16,
+            child: FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => FavouritePage()),
+                );
+              },
+              child: Text("Favourites"),
+              backgroundColor:
+                  Colors.red, // Adjust the background color as needed
+            ),
+          ),*/
           // HomePageBackground(
           //   screenHeight: MediaQuery.of(context).size.height,
           // ),
