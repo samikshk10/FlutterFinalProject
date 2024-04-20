@@ -52,6 +52,7 @@ dependencies:
   open_street_map_search_and_pick: ^0.1.1
   geocoding: ^3.0.0
   geolocator: ^10.1.1
+  pull_to_refresh: ^2.0.0
 
 dev_dependencies:
   flutter_test:

@@ -8,8 +8,16 @@ class CategoryList {
   CategoryList._internal();
 
   List<String> categories = [
-    'Category 1',
-    'Category 2',
-    'Category 3',
+    'Music',
+    'Sports',
+    'Food',
+    'Travel',
+    'Fashion',
+    'Technology',
+    'Education',
+    'Health',
+    'Business',
+    'Art',
+    'Others'
   ];
 }
