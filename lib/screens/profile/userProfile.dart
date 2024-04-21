@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojectfinal/screens/profile/editProfile.dart';
+import 'package:flutterprojectfinal/screens/profile/favouritePage.dart';
 import 'package:flutterprojectfinal/utils/constant.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/customButton.dart';
 
@@ -22,6 +23,7 @@ class _UserProfileState extends State<UserProfile> {
     });
     print('First Screen is visible again');
   }
+
   void _logout() async {
     try {
       await FirebaseAuth.instance.signOut();
@@ -30,6 +32,7 @@ class _UserProfileState extends State<UserProfile> {
       print("Error occurred during logout: $e");
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,42 +42,51 @@ class _UserProfileState extends State<UserProfile> {
             SizedBox(height: 30),
             Stack(
               children: [
-                _image != null ? CircleAvatar(radius: 65,
-                  backgroundImage: MemoryImage(_image!))  : CircleAvatar(
-                  radius: 65,
-                  backgroundImage: AssetImage('assets/images/admin.png'),
-                ),
+                _image != null
+                    ? CircleAvatar(
+                        radius: 65, backgroundImage: MemoryImage(_image!))
+                    : CircleAvatar(
+                        radius: 65,
+                        backgroundImage: AssetImage('assets/images/admin.png'),
+                      ),
               ],
             ),
             Center(
               child: Row(
                 children: [
-                  SizedBox(width: 100,),
+                  SizedBox(
+                    width: 100,
+                  ),
                   Text(
                     (FirebaseAuth.instance.currentUser != null
-                        ?displayName ??
-                        "ANONYMOUS"
+                        ? displayName ?? "ANONYMOUS"
                         : "ANONYMOUS"),
                     style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
                   ),
-                  IconButton(onPressed: (){
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => EditProfile()));
-                  }, icon: Icon(Icons.edit)),
+                  IconButton(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => EditProfile()));
+                      },
+                      icon: Icon(Icons.edit)),
                 ],
               ),
             ),
-            Text( (FirebaseAuth.instance.currentUser != null
-                ? FirebaseAuth.instance.currentUser!.email ??
-                "ANONYMOUS"
-                : "ANONYMOUS"),
-              style: TextStyle(fontSize:15, color: gray),
+            Text(
+              (FirebaseAuth.instance.currentUser != null
+                  ? FirebaseAuth.instance.currentUser!.email ?? "ANONYMOUS"
+                  : "ANONYMOUS"),
+              style: TextStyle(fontSize: 15, color: gray),
             ),
-            SizedBox(height: 40,),
+            SizedBox(
+              height: 40,
+            ),
             ListTile(
               title: Text('Notification Center'),
               tileColor: lightGray,
-              onTap: (){},
+              onTap: () {},
               leading: Icon(Icons.notifications),
               trailing: Icon(Icons.arrow_forward_ios_outlined),
             ),
@@ -82,7 +94,10 @@ class _UserProfileState extends State<UserProfile> {
             ListTile(
               title: Text('Following'),
               tileColor: lightGray,
-              onTap: (){},
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => FavouritePage()));
+              },
               leading: Icon(Icons.favorite),
               trailing: Icon(Icons.arrow_forward_ios_outlined),
             ),
@@ -90,7 +105,7 @@ class _UserProfileState extends State<UserProfile> {
             ListTile(
               title: Text('Settings'),
               tileColor: lightGray,
-              onTap: (){},
+              onTap: () {},
               leading: Icon(Icons.settings),
               trailing: Icon(Icons.arrow_forward_ios_outlined),
             ),

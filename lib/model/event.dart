@@ -1,5 +1,6 @@
 class Event {
-  final String imagePath,
+  final String eventId,
+      imagePath,
       title,
       description,
       location,
@@ -13,6 +14,7 @@ class Event {
   Event(
       {required this.imagePath,
       required this.title,
+      required this.eventId,
       required this.description,
       required this.location,
       required this.duration,
@@ -26,6 +28,7 @@ class Event {
 }
 
 final fiveKmRunEvent = Event(
+    eventId: "1",
     imagePath: "assets/event_images/5_km_downtown_run.jpeg",
     title: "5 Kilometer Downtown Run",
     description: "",
@@ -40,6 +43,7 @@ final fiveKmRunEvent = Event(
     latitude: 12.5);
 
 final cookingEvent = Event(
+    eventId: "2",
     imagePath: "assets/event_images/granite_cooking_class.jpeg",
     title: "Granite Cooking Class",
     description:
@@ -59,6 +63,7 @@ final cookingEvent = Event(
     latitude: 123.5);
 
 final musicConcert = Event(
+    eventId: "3",
     imagePath: "assets/event_images/music_concert.jpeg",
     title: "Arijit Music Concert",
     description: "Listen to Arijit's latest compositions.",
@@ -77,6 +82,7 @@ final musicConcert = Event(
     latitude: 123.5);
 
 final golfCompetition = Event(
+    eventId: "4",
     imagePath: "assets/event_images/golf_competition.jpeg",
     title: "Season 2 Golf Estate",
     description: "",
