@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutterprojectfinal/events/add_events/add_events.dart';
+import 'package:flutterprojectfinal/screens/auth/admin/adminPage.dart';
 import 'package:flutterprojectfinal/screens/auth/login/login_screen.dart';
 import 'package:flutterprojectfinal/screens/auth/signup/signup_screen.dart';
 import 'package:flutterprojectfinal/ui/homepage/page_render.dart';
@@ -30,7 +31,7 @@ class MyApp extends StatelessWidget {
         ),
         initialRoute: '/',
         routes: {
-          '/': (context) => LoginScreen(),
+          '/': (context) => AdminPage(),
           '/signup': (context) => SignUpScreen(),
           '/home': (context) => PageRender(),
           '/addevent': (context) => AddEventScreen()
