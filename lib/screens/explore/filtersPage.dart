@@ -1,27 +1,20 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutterprojectfinal/model/category.dart';
+import 'package:flutterprojectfinal/model/category.dart' as MyCategory;
 import 'package:flutterprojectfinal/screens/customWidgets/customButton.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/filterGroupContainer.dart';
-import 'package:flutterprojectfinal/app/configs/categories.dart';
 
 class FiltersPage extends StatefulWidget {
-  const FiltersPage({super.key});
+  const FiltersPage({Key? key}) : super(key: key);
 
   @override
   State<FiltersPage> createState() => _FiltersPageState();
 }
 
 class _FiltersPageState extends State<FiltersPage> {
-  final List<String> _categories = [
-    'Music',
-    'Business',
-    'Food & drink',
-    'Community',
-    'Arts',
-    'Film & Media',
-    'Health'
-  ];
+  List<MyCategory.Category> _categories =
+      MyCategory.categories; // Accessing categories list
+
   bool isSwitched = false;
   @override
   Widget build(BuildContext context) {
@@ -39,26 +32,20 @@ class _FiltersPageState extends State<FiltersPage> {
         child: Column(
           children: [
             Expanded(
-                child: ListView(
-              children: [
-                FilterGroup(title: 'Categories', filters: _categories),
-                FilterGroup(title: 'Event type', filters: _categories),
-                ListTile(
-                  leading: Text('Only free events'),
-                  trailing: Switch(
-                      value: isSwitched,
-                      onChanged: (value) {
-                        setState(() {
-                          isSwitched = !isSwitched;
-                        });
-                      }),
-                )
-              ],
-            )),
+              child: ListView(
+                children: [
+                  FilterGroup(title: 'Categories', filters: _categories),
+                  FilterGroup(title: 'Event type', filters: _categories),
+                ],
+              ),
+            ),
             Expanded(child: SizedBox()),
-            CustomButton(label: 'Apply Filters', press: (){
-              Navigator.pop(context);
-            })
+            CustomButton(
+              label: 'Apply Filters',
+              press: () {
+                Navigator.pop(context);
+              },
+            ),
           ],
         ),
       ),

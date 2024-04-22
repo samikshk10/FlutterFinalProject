@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutterprojectfinal/model/category.dart';
 
 class FilterGroup extends StatefulWidget {
   final String title;
-  final List<String> filters;
+  final List<Category> filters;
 
   const FilterGroup({
     super.key,
@@ -15,7 +16,7 @@ class FilterGroup extends StatefulWidget {
 }
 
 class _FilterGroupState extends State<FilterGroup> {
-  late List<String> visibleFilters;
+  late List<Category> visibleFilters;
   bool showAll = false;
 
   @override
@@ -38,7 +39,8 @@ class _FilterGroupState extends State<FilterGroup> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(widget.title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          Text(widget.title,
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           SizedBox(height: 8),
           GridView.builder(
             shrinkWrap: true,
@@ -65,7 +67,7 @@ class _FilterGroupState extends State<FilterGroup> {
 }
 
 class FilterButton extends StatefulWidget {
-  final String filterName;
+  final Category filterName;
   const FilterButton({Key? key, required this.filterName}) : super(key: key);
 
   @override
@@ -86,9 +88,8 @@ class _FilterButtonState extends State<FilterButton> {
     return OutlinedButton(
       onPressed: _toggleColor,
       style: OutlinedButton.styleFrom(
-        foregroundColor: _isClicked ? Colors.blue : Colors.grey
-      ),
-      child: Text(widget.filterName),
+          foregroundColor: _isClicked ? Colors.blue : Colors.grey),
+      child: Text(widget.filterName.name),
     );
   }
 }

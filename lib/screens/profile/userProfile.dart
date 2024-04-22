@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:ez_validator/ez_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojectfinal/screens/profile/editProfile.dart';
@@ -59,16 +60,21 @@ class _UserProfileState extends State<UserProfile> {
                   ),
                   Text(
                     (FirebaseAuth.instance.currentUser != null
-                        ? displayName ?? "ANONYMOUS"
-                        : "ANONYMOUS"),
+                        ? displayName ?? "User"
+                        : "User"),
                     style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
                   ),
                   IconButton(
-                      onPressed: () {
-                        Navigator.push(
+                      onPressed: () async {
+                        final name = await Navigator.push(
                             context,
                             MaterialPageRoute(
                                 builder: (context) => EditProfile()));
+                        if (name != null) {
+                          setState(() {
+                            displayName = name;
+                          });
+                        }
                       },
                       icon: Icon(Icons.edit)),
                 ],

@@ -1,9 +1,13 @@
 import 'dart:typed_data';
 
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
+import 'package:firebase_core/firebase_core.dart';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutterprojectfinal/services/provider/userCredentialProvider.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 import '../../resourcecs/add_data.dart';
 import '../../utils/pickImage.dart';
@@ -27,24 +31,26 @@ class _EditProfileState extends State<EditProfile> {
     });
   }
 
-  void _saveProfile() async {
+  void _saveProfile(BuildContext context) async {
     print(_nameController.text);
-    String resp = await StoreData().saveData(file: _image!);
-    try {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(FirebaseAuth.instance.currentUser?.uid)
-          .update({'name': _nameController.text});
-      print('name updated successfully');
-    } catch (err) {
-      print(err);
+    // String resp = await StoreData().saveData(file: _image!);
+    // Access the UserCredential from the provider
+
+    auth.UserCredential? userCredential =
+        Provider.of<UserCredentialProvider>(context, listen: false)
+            .userCredential;
+
+    if (userCredential != null) {
+      // Use the userCredential object
+      await userCredential.user?.updateDisplayName(_nameController.text);
     }
   }
 
   @override
   void initState() {
     super.initState();
-    _nameController.text = FirebaseAuth.instance.currentUser?.displayName ?? '';
+    _nameController.text =
+        auth.FirebaseAuth.instance.currentUser?.displayName ?? '';
   }
 
   @override
@@ -98,8 +104,8 @@ class _EditProfileState extends State<EditProfile> {
             ),
             ElevatedButton(
                 onPressed: () {
-                  _saveProfile();
-                  Navigator.pop(context);
+                  _saveProfile(context);
+                  Navigator.pop(context, _nameController.text);
                 },
                 child: Text('Save Changes'))
           ],

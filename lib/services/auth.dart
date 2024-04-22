@@ -1,18 +1,24 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutterprojectfinal/services/provider/userCredentialProvider.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:provider/provider.dart';
 
 class AuthMethods {
   static FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   static Future<dynamic> loginWithEmailAndPassword(
-      String email, String password) async {
+      BuildContext context, email, String password) async {
     try {
       String res = "Some error occured";
 
       auth.UserCredential result = await auth.FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
+      Provider.of<UserCredentialProvider>(context, listen: false)
+          .setUserCredential(result);
+
       return res = "success";
     } on auth.FirebaseAuthException catch (exception, s) {
       debugPrint('$exception$s');

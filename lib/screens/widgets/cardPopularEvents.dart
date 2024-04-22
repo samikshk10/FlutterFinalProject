@@ -1,12 +1,13 @@
 import 'package:flutterprojectfinal/app/configs/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojectfinal/model/event.dart';
+import 'package:flutterprojectfinal/model/eventModel.dart';
 import 'package:flutterprojectfinal/screens/profile/favouritePage.dart';
 import 'package:flutterprojectfinal/services/provider/favouriteProvider.dart';
 import 'package:provider/provider.dart';
 
 class CardPopularEvent extends StatefulWidget {
-  final Event eventModel;
+  final EventModel eventModel;
 
   const CardPopularEvent({required this.eventModel, Key? key})
       : super(key: key);
@@ -44,7 +45,7 @@ class _CardPopularEventState extends State<CardPopularEvent> {
           child: Stack(
             children: [
               Image.asset(
-                widget.eventModel.imagePath,
+                widget.eventModel.imageUrl,
                 fit: BoxFit.cover,
                 width: double.infinity,
                 height: double.infinity,
@@ -63,11 +64,9 @@ class _CardPopularEventState extends State<CardPopularEvent> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      Text(widget.eventModel.startDate),
                       Text(
-                        widget.eventModel.date.split(" ")[0],
-                      ),
-                      Text(
-                        widget.eventModel.date.split(" ")[1],
+                        widget.eventModel.endDate,
                         style: const TextStyle(
                           color: AppColors.primaryColor,
                         ),
@@ -114,7 +113,7 @@ class _CardPopularEventState extends State<CardPopularEvent> {
                             SizedBox(width: 8),
                             Flexible(
                               child: Text(
-                                widget.eventModel.location,
+                                widget.eventModel.location ?? "not specified",
                                 style: const TextStyle(
                                   fontSize: 12,
                                   color: AppColors.greyTextColor,
@@ -127,20 +126,30 @@ class _CardPopularEventState extends State<CardPopularEvent> {
                       ],
                     ),
                   ),
-                  IconButton(
-                    onPressed: () {
-                      provider.toggleFavourite(widget.eventModel);
-                      provider.addFavourite(widget.eventModel);
-                    },
-                    icon: Icon(
-                      provider.isExist(widget.eventModel)
-                          ? Icons.favorite
-                          : Icons.favorite_border,
-                      color: provider.isExist(widget.eventModel)
-                          ? Colors.red
-                          : null,
-                    ),
-                  ),
+                  // FutureBuilder<bool>(
+                  //   future: provider.isExist(eventModel),
+                  //   builder: (context, snapshot) {
+                  //     if (snapshot.connectionState == ConnectionState.waiting) {
+                  //       // Return a loading indicator while waiting for the result
+                  //       return CircularProgressIndicator();
+                  //     } else if (snapshot.hasError) {
+                  //       // Handle error
+                  //       return Icon(
+                  //           Icons.error); // Or any other error indicator
+                  //     } else {
+                  //       final bool isFavorite = snapshot.data!;
+                  //       return CircleButton(
+                  //         icon: Icon(
+                  //           isFavorite ? Icons.favorite : Icons.favorite_border,
+                  //           color: isFavorite ? Colors.red : null,
+                  //         ),
+                  //         onTap: () {
+                  //           provider.toggleFavourite(eventModel);
+                  //         },
+                  //       );
+                  //     }
+                  //   },
+                  // ),
                 ],
               ),
             );

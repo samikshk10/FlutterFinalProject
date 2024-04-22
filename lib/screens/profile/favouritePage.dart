@@ -32,8 +32,6 @@ class _FavouritePageState extends State<FavouritePage> {
           .collection('events')
           .doc(eventId)
           .get();
-      print("hello::${event.data()}");
-      print("snapshotData:${doc.data()}");
     }
 
     return events[0];
