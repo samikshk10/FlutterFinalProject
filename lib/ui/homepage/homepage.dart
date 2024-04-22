@@ -4,6 +4,7 @@ import 'package:flutterprojectfinal/app_state.dart';
 import 'package:flutterprojectfinal/model/event.dart';
 import 'package:flutterprojectfinal/model/eventModel.dart';
 import 'package:flutterprojectfinal/screens/widgets/cardPopularEvents.dart';
+import 'package:flutterprojectfinal/services/provider/favouriteProvider.dart';
 import 'package:flutterprojectfinal/ui/event_detail/event_details.dart';
 import 'package:flutterprojectfinal/ui/event_details/event_details_page.dart';
 import 'package:flutterprojectfinal/ui/homepage/category_widget.dart';
@@ -119,13 +120,18 @@ class _HomePageState extends State<HomePage> {
   Future<List<EventModel>> _fetchEvents(String? categoryName) async {
     QuerySnapshot querySnapshot =
         await FirebaseFirestore.instance.collection('events').get();
+    print('1');
     Placemark place = await _determinePosition();
     print("postion  $place.subAdministrativeArea");
+    print('2');
 
     return querySnapshot.docs
         .where((doc) {
+          print('3');
           var eventData = EventModel.fromFirestore(doc);
+          print('4');
           List<String> locations = eventData.location!.split(",");
+
           return locations[3].trim() ==
                   place.subAdministrativeArea.toString() &&
               (categoryName == "All" || eventData.category == categoryName);
@@ -302,6 +308,9 @@ class _HomePageState extends State<HomePage> {
                                         key:
                                             Key('event_details_${event.title}'),
                                         eventModel: event,
+                                        provider:
+                                            Provider.of<FavouriteProvider>(
+                                                context),
                                       ),
                                     ),
                                   );
@@ -416,7 +425,7 @@ Widget _listPopularEvent(List<Event> events) => Container(
                 '/signup', // Make sure this is the correct route
                 arguments: events[index],
               ),
-              child: CardPopularEvent(eventModel: events[index]),
+              child: Text("hello"),
             ),
           ),
         ),

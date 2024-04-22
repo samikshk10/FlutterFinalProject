@@ -13,9 +13,11 @@ class EventModel {
   double? longitude, latitude;
   String? punchLine, location;
   bool isOnlineEvent;
+  String eventId;
 
   EventModel(
-      {required this.title,
+      {required this.eventId,
+      required this.title,
       required this.description,
       required this.isOnlineEvent,
       this.location,
@@ -34,6 +36,7 @@ class EventModel {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
 
     return EventModel(
+      eventId: data['eventId'],
       title: data['title'],
       description: data['description'],
       startDate: data['startDate'],

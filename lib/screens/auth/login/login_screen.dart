@@ -30,7 +30,8 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       String email = _emailController.text.toString().trim();
       String pass = _passwordController.text.toString().trim();
-      var response = await AuthMethods.loginWithEmailAndPassword(email, pass);
+      var response = await AuthMethods.loginWithEmailAndPassword(
+          dialogcontext, email, pass);
       if (response == "success") {
         Navigator.pushReplacement(
           context,
@@ -141,7 +142,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               SizedBox(height: 32),
-              Text("Don't have an account?", style: TextStyle(fontSize: 20),),
+              Text(
+                "Don't have an account?",
+                style: TextStyle(fontSize: 20),
+              ),
               CustomButton(
                   label: 'SignUp',
                   press: () {

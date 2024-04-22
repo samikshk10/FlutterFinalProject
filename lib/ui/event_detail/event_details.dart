@@ -2,14 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutterprojectfinal/app/configs/colors.dart';
 import 'package:flutterprojectfinal/model/event.dart';
 import 'package:flutterprojectfinal/model/eventModel.dart';
+import 'package:flutterprojectfinal/services/provider/favouriteProvider.dart';
 import 'package:flutterprojectfinal/widgets/globalwidget/circlebutton.dart';
 import 'package:syncfusion_flutter_maps/maps.dart';
 import 'package:intl/intl.dart';
 
 class DetailPage extends StatelessWidget {
   final EventModel eventModel;
-
-  const DetailPage({Key? key, required this.eventModel}) : super(key: key);
+  final FavouriteProvider provider;
+  const DetailPage({Key? key, required this.eventModel, required this.provider})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -57,13 +59,29 @@ class DetailPage extends StatelessWidget {
             "Detail",
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
           ),
-          CircleButton(
-            icon: Icon(
-              Icons.favorite_border_outlined,
-              color: Colors.white,
-            ),
-            onTap: () {},
-          )
+          FutureBuilder<bool>(
+            future: provider.isExist(eventModel),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                // Return a loading indicator while waiting for the result
+                return CircularProgressIndicator();
+              } else if (snapshot.hasError) {
+                // Handle error
+                return Icon(Icons.error); // Or any other error indicator
+              } else {
+                final bool isFavorite = snapshot.data!;
+                return CircleButton(
+                  icon: Icon(
+                    isFavorite ? Icons.favorite : Icons.favorite_border,
+                    color: isFavorite ? Colors.red : null,
+                  ),
+                  onTap: () {
+                    provider.toggleFavourite(eventModel);
+                  },
+                );
+              }
+            },
+          ),
         ],
       );
 

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojectfinal/model/eventModel.dart';
 import 'package:flutterprojectfinal/screens/explore/filtersPage.dart';
+import 'package:flutterprojectfinal/services/provider/favouriteProvider.dart';
 import 'package:flutterprojectfinal/ui/event_detail/event_details.dart';
 import 'package:flutterprojectfinal/ui/event_details/event_details_page.dart';
 import 'package:flutterprojectfinal/ui/homepage/event_widget.dart';
@@ -130,6 +131,7 @@ class _ExplorePageState extends State<ExplorePage> {
                             builder: (context) => DetailPage(
                               key: Key('event_details_${event.title}'),
                               eventModel: event,
+                              provider: Provider.of<FavouriteProvider>(context),
                             ),
                           ),
                         );
