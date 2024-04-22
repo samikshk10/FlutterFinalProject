@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ez_validator/ez_validator.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutterprojectfinal/app/configs/categoriesList.dart';
 import 'package:flutterprojectfinal/screens/widgets/location.dart';
 import 'package:geocoding/geocoding.dart';
@@ -157,9 +158,10 @@ class _AddEventScreenState extends State<AddEventScreen> {
 
     String _eventDuration =
         calculateEventDuration(_startDate, _endDate, _startTime, _endTime);
-
+    print(FirebaseAuth.instance.currentUser!.uid);
     // Add the event data to Firestore
     events.add({
+      'eventId': DateTime.now().millisecondsSinceEpoch.toString(),
       'title': _titleController.text,
       'description': _descriptionController.text,
       'location': _locationController.text,

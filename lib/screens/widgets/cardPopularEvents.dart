@@ -1,13 +1,21 @@
 import 'package:flutterprojectfinal/app/configs/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojectfinal/model/event.dart';
+import 'package:flutterprojectfinal/screens/profile/favouritePage.dart';
+import 'package:flutterprojectfinal/services/provider/favouriteProvider.dart';
+import 'package:provider/provider.dart';
 
-class CardPopularEvent extends StatelessWidget {
+class CardPopularEvent extends StatefulWidget {
   final Event eventModel;
 
   const CardPopularEvent({required this.eventModel, Key? key})
       : super(key: key);
 
+  @override
+  State<CardPopularEvent> createState() => _CardPopularEventState();
+}
+
+class _CardPopularEventState extends State<CardPopularEvent> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -36,7 +44,7 @@ class CardPopularEvent extends StatelessWidget {
           child: Stack(
             children: [
               Image.asset(
-                eventModel.imagePath,
+                widget.eventModel.imagePath,
                 fit: BoxFit.cover,
                 width: double.infinity,
                 height: double.infinity,
@@ -56,10 +64,10 @@ class CardPopularEvent extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        eventModel.date.split(" ")[0],
+                        widget.eventModel.date.split(" ")[0],
                       ),
                       Text(
-                        eventModel.date.split(" ")[1],
+                        widget.eventModel.date.split(" ")[1],
                         style: const TextStyle(
                           color: AppColors.primaryColor,
                         ),
@@ -77,58 +85,66 @@ class CardPopularEvent extends StatelessWidget {
         bottom: 0,
         right: 0,
         left: 0,
-        child: Container(
-          height: 60,
-          width: 110,
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-          margin: const EdgeInsets.symmetric(horizontal: 12),
-          decoration: BoxDecoration(
-              color: AppColors.whiteColor,
-              borderRadius: BorderRadius.circular(12)),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      eventModel.title,
-                      style: const TextStyle(fontWeight: FontWeight.w500),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 6),
-                    Row(
+        child: Consumer<FavouriteProvider>(
+          builder: (context, provider, _) {
+            return Container(
+              height: 60,
+              width: 110,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+              margin: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                  color: AppColors.whiteColor,
+                  borderRadius: BorderRadius.circular(12)),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(Icons.location_on, color: Colors.grey),
-                        SizedBox(width: 8),
-                        Flexible(
-                          child: Text(
-                            eventModel.location,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: AppColors.greyTextColor,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                        Text(
+                          widget.eventModel.title,
+                          style: const TextStyle(fontWeight: FontWeight.w500),
+                          overflow: TextOverflow.ellipsis,
                         ),
+                        const SizedBox(height: 6),
+                        Row(
+                          children: [
+                            Icon(Icons.location_on, color: Colors.grey),
+                            SizedBox(width: 8),
+                            Flexible(
+                              child: Text(
+                                widget.eventModel.location,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: AppColors.greyTextColor,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        )
                       ],
-                    )
-                  ],
-                ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      provider.toggleFavourite(widget.eventModel);
+                      provider.addFavourite(widget.eventModel);
+                    },
+                    icon: Icon(
+                      provider.isExist(widget.eventModel)
+                          ? Icons.favorite
+                          : Icons.favorite_border,
+                      color: provider.isExist(widget.eventModel)
+                          ? Colors.red
+                          : null,
+                    ),
+                  ),
+                ],
               ),
-              Container(
-                width: 30,
-                height: 30,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: AppColors.primaryLightColor,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(Icons.thumb_up, size: 18),
-              )
-            ],
-          ),
+            );
+          },
         ),
       );
 }
