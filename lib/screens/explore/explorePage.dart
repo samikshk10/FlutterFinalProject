@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojectfinal/model/eventModel.dart';
 import 'package:flutterprojectfinal/screens/explore/filtersPage.dart';
+import 'package:flutterprojectfinal/ui/event_detail/event_details.dart';
 import 'package:flutterprojectfinal/ui/event_details/event_details_page.dart';
 import 'package:flutterprojectfinal/ui/homepage/event_widget.dart';
 import 'package:geocoding/geocoding.dart';
@@ -32,9 +33,10 @@ class _ExplorePageState extends State<ExplorePage> {
 
   String _status = 'Online';
   @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
+      body: ListView(
         children: [
           SearchBar(
             leading: Icon(Icons.search),
@@ -98,7 +100,7 @@ class _ExplorePageState extends State<ExplorePage> {
                 ElevatedButton.icon(
                     onPressed: () {},
                     icon: Icon(Icons.fastfood_rounded),
-                    label: Text('Food & Dirnks')),
+                    label: Text('Food & Drinks')),
                 SizedBox(
                   width: 3,
                 ),
@@ -125,9 +127,9 @@ class _ExplorePageState extends State<ExplorePage> {
                       onTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (context) => EventDetailsPage(
-                              key: Key('event_details'),
-                              event: event,
+                            builder: (context) => DetailPage(
+                              key: Key('event_details_${event.title}'),
+                              eventModel: event,
                             ),
                           ),
                         );

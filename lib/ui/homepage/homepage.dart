@@ -4,6 +4,7 @@ import 'package:flutterprojectfinal/app_state.dart';
 import 'package:flutterprojectfinal/model/event.dart';
 import 'package:flutterprojectfinal/model/eventModel.dart';
 import 'package:flutterprojectfinal/screens/widgets/cardPopularEvents.dart';
+import 'package:flutterprojectfinal/ui/event_detail/event_details.dart';
 import 'package:flutterprojectfinal/ui/event_details/event_details_page.dart';
 import 'package:flutterprojectfinal/ui/homepage/category_widget.dart';
 import 'package:flutterprojectfinal/ui/homepage/event_widget.dart';
@@ -281,9 +282,10 @@ class _HomePageState extends State<HomePage> {
                                 onTap: () {
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
-                                      builder: (context) => EventDetailsPage(
-                                        key: Key('event_details'),
-                                        event: event,
+                                      builder: (context) => DetailPage(
+                                        key:
+                                            Key('event_details_${event.title}'),
+                                        eventModel: event,
                                       ),
                                     ),
                                   );
