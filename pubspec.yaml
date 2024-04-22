@@ -53,11 +53,8 @@ dependencies:
   geocoding: ^3.0.0
   geolocator: ^10.1.1
   pull_to_refresh: ^2.0.0
-<<<<<<< HEAD
   syncfusion_flutter_maps: ^25.1.40
-=======
   firebase_database: ^10.5.2
->>>>>>> dab4fd1b7c5868e15e3c6d06a68be4a4cb1ba581
 
 dev_dependencies:
   flutter_test:
