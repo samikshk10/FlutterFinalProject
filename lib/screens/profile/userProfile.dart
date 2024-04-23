@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:ez_validator/ez_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterprojectfinal/screens/organizer/addorganizer.dart';
 import 'package:flutterprojectfinal/screens/profile/editProfile.dart';
 import 'package:flutterprojectfinal/screens/profile/favouritePage.dart';
 import 'package:flutterprojectfinal/utils/constant.dart';
@@ -92,10 +93,15 @@ class _UserProfileState extends State<UserProfile> {
               height: 40,
             ),
             ListTile(
-              title: Text('Notification Center'),
+              title: Text('Be a Organizer'),
               tileColor: lightGray,
-              onTap: () {},
-              leading: Icon(Icons.notifications),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => AddOrganizerScreen()));
+              },
+              leading: Icon(Icons.person_add_alt_1_rounded),
               trailing: Icon(Icons.arrow_forward_ios_outlined),
             ),
             SizedBox(height: 10),

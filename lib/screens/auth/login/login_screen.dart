@@ -24,6 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool isPassword = true;
   String emailError = "";
   String passwordError = "";
+  bool isSwitched = false;
   final _formKey = GlobalKey<FormState>();
 
   void handleLogin(BuildContext dialogcontext) async {
@@ -97,6 +98,29 @@ class _LoginScreenState extends State<LoginScreen> {
                 style: TextStyle(fontSize: 24, color: gray),
               ),
               SizedBox(height: 32),
+              Container(
+                margin: EdgeInsets.only(left: 25),
+                child: ListTile(
+                  leading: Text(
+                    'Login as Organizer',
+                    style: TextStyle(fontSize: 12),
+                  ),
+                  title: Transform.translate(
+                    offset: Offset(-80, 0),
+                    child: Transform.scale(
+                      scale: 0.7, // Adjust the scale factor as needed
+                      child: Switch(
+                        value: isSwitched,
+                        onChanged: (value) {
+                          setState(() {
+                            isSwitched = !isSwitched;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ),
               Form(
                 key: _formKey,
                 child: Padding(
@@ -188,7 +212,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     handleLogin(context);
                   }
                 },
-              )
+              ),
+              SizedBox(height: 24),
             ],
           ),
         ),

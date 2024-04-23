@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           appBarTheme: AppBarTheme(
-              backgroundColor: Colors.purple,
+              backgroundColor: Colors.blue,
               titleTextStyle: TextStyle(fontSize: 24, color: Colors.white)),
         ),
         initialRoute: '/',
