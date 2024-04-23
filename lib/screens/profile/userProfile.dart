@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:ez_validator/ez_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterprojectfinal/screens/profile/changePassword.dart';
 import 'package:flutterprojectfinal/screens/profile/editProfile.dart';
 import 'package:flutterprojectfinal/screens/profile/favouritePage.dart';
 import 'package:flutterprojectfinal/utils/constant.dart';
@@ -111,9 +112,14 @@ class _UserProfileState extends State<UserProfile> {
             ),
             SizedBox(height: 10),
             ListTile(
-              title: Text('Settings'),
+              title: Text('Change Password'),
               tileColor: lightGray,
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ChangePasswordPage()));
+              },
               leading: Icon(Icons.settings),
               trailing: Icon(Icons.arrow_forward_ios_outlined),
             ),
