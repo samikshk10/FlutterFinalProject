@@ -11,9 +11,7 @@ import 'package:flutterprojectfinal/ui/homepage/category_widget.dart';
 import 'package:flutterprojectfinal/ui/homepage/event_widget.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
-
 import 'package:provider/provider.dart';
-
 import '../../app_state.dart';
 import 'category_widget.dart';
 import 'event_widget.dart';
@@ -35,9 +33,14 @@ class _HomePageState extends State<HomePage> {
   RefreshController _refreshController =
       RefreshController(initialRefresh: false);
   String selectedCategoryName = "All";
+  final TextEditingController _searchController = TextEditingController();
+
+  String _searchQuery = "";
+
   @override
   void initState() {
     super.initState();
+    _fetchPopularEvents(); // Call _fetchPopularEvents in initState to load popular events initially
   }
 
   Future<List<Event>> _fetchPopularEvents() async {
@@ -95,47 +98,16 @@ class _HomePageState extends State<HomePage> {
     return place;
   }
 
-  // Future<List<EventModel>> _fetchEvents(String? categoryName) async {
-  //   LocalEvents.clear();
-
-  //   QuerySnapshot querySnapshot =
-  //       await FirebaseFirestore.instance.collection('events').get();
-  //   Placemark place = await _determinePosition();
-  //   print("postion  $place.subAdministrativeArea");
-
-  //   querySnapshot.docs.forEach((doc) {
-  //     var eventData = EventModel.fromFirestore(doc);
-  //     List<String> locations = eventData.location!.split(",");
-  //     if (locations[3].trim() ==
-  //         place.subAdministrativeArea.toString()) if (categoryName == "All") {
-  //       LocalEvents.add(EventModel.fromFirestore(doc));
-  //     } else if (eventData.category == categoryName) {
-  //       LocalEvents.add(EventModel.fromFirestore(doc));
-  //     }
-  //   });
-
-  //   return LocalEvents;
-  // }
-
   Future<List<EventModel>> _fetchEvents(String? categoryName) async {
     QuerySnapshot querySnapshot =
         await FirebaseFirestore.instance.collection('events').get();
-    print('1');
     Placemark place = await _determinePosition();
-    print("postion  $place.subAdministrativeArea");
-    print('2');
 
     return querySnapshot.docs
-        .where((doc) {
-          print('3');
-          var eventData = EventModel.fromFirestore(doc);
-          print('4');
-          List<String> locations = eventData.location!.split(",");
-
-          return locations[3].trim() ==
-                  place.subAdministrativeArea.toString() &&
-              (categoryName == "All" || eventData.category == categoryName);
-        })
+        .where((doc) =>
+            doc['location'].toString().split(",")[3].trim() ==
+                place.subAdministrativeArea.toString() &&
+            (categoryName == "All" || doc['category'] == categoryName))
         .map((doc) => EventModel.fromFirestore(doc))
         .toList();
   }
@@ -146,24 +118,6 @@ class _HomePageState extends State<HomePage> {
       create: (_) => AppState(),
       child: Stack(
         children: <Widget>[
-          /*Positioned(
-            bottom: 16,
-            right: 16,
-            child: FloatingActionButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => FavouritePage()),
-                );
-              },
-              child: Text("Favourites"),
-              backgroundColor:
-                  Colors.red, // Adjust the background color as needed
-            ),
-          ),*/
-          // HomePageBackground(
-          //   screenHeight: MediaQuery.of(context).size.height,
-          // ),
           SmartRefresher(
             controller: _refreshController,
             onRefresh: _onRefresh,
@@ -182,19 +136,6 @@ class _HomePageState extends State<HomePage> {
                             style: fadedTextStyle,
                           ),
                           Spacer(),
-                          // Text(
-                          //   "Welcome " +
-                          //       (FirebaseAuth.instance.currentUser != null
-                          //           ? FirebaseAuth
-                          //                   .instance.currentUser!.displayName ??
-                          //               "ANONYMOUS"
-                          //           : "ANONYMOUS"),
-                          //   style: TextStyle(
-                          //     fontWeight: FontWeight.bold,
-                          //     fontSize: 14,
-                          //     color: Colors.black,
-                          //   ),
-                          // )
                         ],
                       ),
                     ),
@@ -205,7 +146,7 @@ class _HomePageState extends State<HomePage> {
                         style: blackHeadingTextStyle,
                       ),
                     ),
-                    _buildSearch(), // Add the search widget here
+                    _buildSearch(),
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 24.0),
                       child: Consumer<AppState>(
@@ -245,23 +186,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     const SizedBox(height: 16),
-
-                    FutureBuilder<List<Event>>(
-                      future: _fetchPopularEvents(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Center(child: CircularProgressIndicator());
-                        } else if (snapshot.hasError) {
-                          return Center(child: Text(snapshot.error.toString()));
-                        } else if (snapshot.hasData) {
-                          List<Event> events = snapshot.data as List<Event>;
-                          return _listPopularEvent(events);
-                        } else {
-                          return const Center(child: Text("No events found."));
-                        }
-                      },
-                    ),
+                    _popularEventsBuilder(),
                     const SizedBox(height: 16),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -286,7 +211,6 @@ class _HomePageState extends State<HomePage> {
                         ],
                       ),
                     ),
-                    // FutureBuilder for fetching events
                     FutureBuilder<List<EventModel>>(
                       future: _fetchEvents(selectedCategoryName),
                       builder: (context, snapshot) {
@@ -298,6 +222,13 @@ class _HomePageState extends State<HomePage> {
                         } else if (snapshot.hasData) {
                           List<EventModel> events =
                               snapshot.data as List<EventModel>;
+                          if (_searchQuery.isNotEmpty) {
+                            events = events
+                                .where((event) => event.title
+                                    .toLowerCase()
+                                    .contains(_searchQuery.toLowerCase()))
+                                .toList();
+                          }
                           return Column(
                             children: events.map((event) {
                               return GestureDetector(
@@ -327,13 +258,11 @@ class _HomePageState extends State<HomePage> {
                         }
                       },
                     ),
-
-                    // Other widgets
                   ],
                 ),
               ),
             ),
-          )
+          ),
         ],
       ),
     );
@@ -341,8 +270,6 @@ class _HomePageState extends State<HomePage> {
 
   Widget _categoryWidget(BuildContext context, Category category) {
     final appState = Provider.of<AppState>(context);
-    // print(
-    //     "app state >>> ${appState.selectedCategoryId} category >>> ${category.categoryId}");
     final isSelected = appState.selectedCategoryId == category.categoryId;
 
     return GestureDetector(
@@ -351,7 +278,6 @@ class _HomePageState extends State<HomePage> {
           appState.updateCategoryId(category.categoryId);
           setState(() {
             selectedCategoryName = category.name;
-            // _fetchEvents(category.name);
           });
         }
       },
@@ -385,49 +311,94 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-}
 
-Widget _buildSearch() => Container(
-      height: 48,
-      width: double.infinity,
-      margin: const EdgeInsets.symmetric(horizontal: 24),
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(50)),
-        color: Colors.white,
-      ),
-      child: TextFormField(
-        decoration: InputDecoration(
-          prefixIcon: Icon(Icons.search, color: Colors.grey),
-          hintText: "Search event...",
-          hintStyle: TextStyle(color: Colors.grey, fontWeight: FontWeight.w400),
-          border: InputBorder.none,
+  Widget _buildSearch() => Container(
+        height: 48,
+        width: double.infinity,
+        margin: const EdgeInsets.symmetric(horizontal: 24),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(50)),
+          color: Colors.white,
         ),
-      ),
-    );
-
-Widget _listPopularEvent(List<Event> events) => Container(
-      width: double.infinity, // or set a specific width
-      height: 270,
-      padding: const EdgeInsets.all(16),
-      child: ListView.builder(
-        physics: const BouncingScrollPhysics(),
-        scrollDirection: Axis.horizontal,
-        itemCount: events.length,
-        itemBuilder: (context, index) => Padding(
-          padding: const EdgeInsets.only(right: 8),
-          child: SizedBox(
-            width: 250,
-            height: 270,
-            child: GestureDetector(
-              onTap: () => Navigator.pushNamed(
-                context,
-                '/signup', // Make sure this is the correct route
-                arguments: events[index],
+        child: Row(
+          children: [
+            Expanded(
+              child: TextFormField(
+                controller: _searchController,
+                onChanged: ((value) {
+                  if (value == "")
+                    setState(() {
+                      _fetchEvents(selectedCategoryName);
+                    });
+                }),
+                decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.search, color: Colors.grey),
+                  hintText: "Search event...",
+                  hintStyle: TextStyle(
+                    color: Colors.grey,
+                    fontWeight: FontWeight.w400,
+                  ),
+                  border: InputBorder.none,
+                ),
               ),
-              child: Text("hello"),
+            ),
+            IconButton(
+              icon: Icon(Icons.search),
+              onPressed: () {
+                setState(() {
+                  _searchQuery = _searchController.text;
+                  if (_searchQuery.isNotEmpty) {
+                    _fetchEvents(selectedCategoryName);
+                  }
+                });
+              },
+            ),
+          ],
+        ),
+      );
+
+  Widget _popularEventsBuilder() {
+    return FutureBuilder<List<Event>>(
+      future: _fetchPopularEvents(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text(snapshot.error.toString()));
+        } else if (snapshot.hasData) {
+          List<Event> events = snapshot.data as List<Event>;
+          return _listPopularEvent(events);
+        } else {
+          return const Center(child: Text("No events found."));
+        }
+      },
+    );
+  }
+
+  Widget _listPopularEvent(List<Event> events) => Container(
+        width: double.infinity, // or set a specific width
+        height: 270,
+        padding: const EdgeInsets.all(16),
+        child: ListView.builder(
+          physics: const BouncingScrollPhysics(),
+          scrollDirection: Axis.horizontal,
+          itemCount: events.length,
+          itemBuilder: (context, index) => Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: SizedBox(
+              width: 250,
+              height: 270,
+              child: GestureDetector(
+                onTap: () => Navigator.pushNamed(
+                  context,
+                  '/signup', // Make sure this is the correct route
+                  arguments: events[index],
+                ),
+                child: Text("hello"),
+              ),
             ),
           ),
         ),
-      ),
-    );
+      );
+}

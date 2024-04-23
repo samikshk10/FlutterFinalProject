@@ -6,10 +6,10 @@ class FilterGroup extends StatefulWidget {
   final List<Category> filters;
 
   const FilterGroup({
-    super.key,
+    Key? key,
     required this.title,
     required this.filters,
-  });
+  }) : super(key: key);
 
   @override
   State<FilterGroup> createState() => _FilterGroupState();
@@ -18,6 +18,7 @@ class FilterGroup extends StatefulWidget {
 class _FilterGroupState extends State<FilterGroup> {
   late List<Category> visibleFilters;
   bool showAll = false;
+  List<String> addedFilters = []; // Initialize here
 
   @override
   void initState() {
@@ -39,8 +40,7 @@ class _FilterGroupState extends State<FilterGroup> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(widget.title,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          Text(widget.title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           SizedBox(height: 8),
           GridView.builder(
             shrinkWrap: true,
@@ -53,7 +53,10 @@ class _FilterGroupState extends State<FilterGroup> {
             ),
             itemCount: visibleFilters.length,
             itemBuilder: (context, index) {
-              return FilterButton(filterName: visibleFilters[index]);
+              return FilterButton(
+                filterName: visibleFilters[index],
+                addedFilters: addedFilters, // Pass the list down
+              );
             },
           ),
           TextButton(
@@ -68,7 +71,8 @@ class _FilterGroupState extends State<FilterGroup> {
 
 class FilterButton extends StatefulWidget {
   final Category filterName;
-  const FilterButton({Key? key, required this.filterName}) : super(key: key);
+  final List<String> addedFilters; // Receive the list here
+  const FilterButton({Key? key, required this.filterName, required this.addedFilters}) : super(key: key);
 
   @override
   State<FilterButton> createState() => _FilterButtonState();
@@ -86,7 +90,13 @@ class _FilterButtonState extends State<FilterButton> {
   @override
   Widget build(BuildContext context) {
     return OutlinedButton(
-      onPressed: _toggleColor,
+      onPressed: () {
+        _toggleColor();
+        setState(() {
+          widget.addedFilters.add(widget.filterName.name);
+        });
+        print(widget.addedFilters); // Print here
+      },
       style: OutlinedButton.styleFrom(
           foregroundColor: _isClicked ? Colors.blue : Colors.grey),
       child: Text(widget.filterName.name),

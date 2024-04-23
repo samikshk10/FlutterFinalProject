@@ -8,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutterprojectfinal/services/provider/userCredentialProvider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 import '../../resourcecs/add_data.dart';
 import '../../utils/pickImage.dart';
@@ -21,7 +22,18 @@ class EditProfile extends StatefulWidget {
 
 class _EditProfileState extends State<EditProfile> {
   Uint8List? _image;
+  String? _imageUrl;
+  String? displayName;
+
   TextEditingController _nameController = TextEditingController();
+  Future<String> uploadImage(Uint8List imageBytes, String userId) async {
+    String filePath = 'profileimage/$userId';
+    firebase_storage.Reference reference =
+        firebase_storage.FirebaseStorage.instance.ref().child(filePath);
+    await reference.putData(imageBytes);
+    String downloadURL = await reference.getDownloadURL();
+    return downloadURL;
+  }
 
   void _selectImage() async {
     print('called');
@@ -32,17 +44,24 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   void _saveProfile(BuildContext context) async {
-    print(_nameController.text);
-    // String resp = await StoreData().saveData(file: _image!);
-    // Access the UserCredential from the provider
-
+    String? userId = Provider.of<UserCredentialProvider>(context, listen: false)
+        .userCredential
+        ?.user
+        ?.uid;
     auth.UserCredential? userCredential =
         Provider.of<UserCredentialProvider>(context, listen: false)
             .userCredential;
+    if (userId != null && _image != null) {
+      String downloadURL = await uploadImage(_image!, userId);
+      userCredential?.user?.updatePhotoURL(downloadURL);
+    }
 
     if (userCredential != null) {
-      // Use the userCredential object
-      await userCredential.user?.updateDisplayName(_nameController.text);
+      await userCredential.user
+          ?.updateDisplayName(_nameController.text)
+          .then((value) => setState(() {
+                displayName = _nameController.text;
+              }));
     }
   }
 
