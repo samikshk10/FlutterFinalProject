@@ -19,7 +19,6 @@ class _FavouritePageState extends State<FavouritePage> {
   @override
   void initState() {
     super.initState();
-    // Call getFavourites only if isLoading is true
     if (isLoading) {
       getFavourites();
     }
