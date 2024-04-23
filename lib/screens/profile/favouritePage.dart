@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ez_validator/ez_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojectfinal/model/event.dart';
+import 'package:flutterprojectfinal/model/eventModel.dart';
 import 'package:flutterprojectfinal/services/provider/favouriteProvider.dart';
 import 'package:provider/provider.dart';
 
@@ -11,55 +13,69 @@ class FavouritePage extends StatefulWidget {
 }
 
 class _FavouritePageState extends State<FavouritePage> {
+  bool isLoading = true;
+  Map<String, EventModel> events = {};
+
   @override
   void initState() {
     super.initState();
-    getFavourites();
+    // Call getFavourites only if isLoading is true
+    if (isLoading) {
+      getFavourites();
+    }
   }
 
-  Future<Event> getFavourites() async {
+  Future<void> getFavourites() async {
     CollectionReference favouriteEvents =
         FirebaseFirestore.instance.collection('favouriteEvents');
-
-    final snapshot = await favouriteEvents
-        .where('userId', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-        .get();
-
-    final List<Event> events = [];
+    final currentUserUid = FirebaseAuth.instance.currentUser!.uid;
+    final snapshot =
+        await favouriteEvents.where('userId', isEqualTo: currentUserUid).get();
     for (var doc in snapshot.docs) {
       final eventId = doc['event'];
-      final event = await FirebaseFirestore.instance
+      final eventSnapshot = await FirebaseFirestore.instance
           .collection('events')
-          .doc(eventId)
+          .where('eventId', isEqualTo: eventId)
           .get();
+      if (!eventSnapshot.isNullOrEmpty) {
+        final eventData = eventSnapshot.docs.first.data();
+        final event = EventModel.fromMap(eventData);
+        events[eventId] = event;
+      }
     }
-
-    return events[0];
+    // Set isLoading to false only after data fetching is complete
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<FavouriteProvider>(context);
-    final events = provider.favouriteEvents;
-
+    print(events);
     return Scaffold(
       appBar: AppBar(
         title: Text('Favourite Page'),
       ),
-      body: events.isEmpty
+      body: isLoading
           ? Center(
-              child: Text('No favorite events.'),
+              child: CircularProgressIndicator(),
             )
-          : ListView.builder(
-              itemCount: events.length,
-              itemBuilder: (context, index) {
-                final event = events[index];
-                return ListTile(
-                  title: Text(event.title),
-                  // Add more details about the event if needed
-                );
-              },
-            ),
+          : events.isEmpty
+              ? Center(
+                  child: Text('No favorite events.'),
+                )
+              : ListView.builder(
+                  itemCount: events.length,
+                  itemBuilder: (context, index) {
+                    final eventId = events.keys.toList()[index];
+                    print("here $eventId");
+                    final event = events[eventId]!;
+                    return ListTile(
+                      title: Text(event.title),
+                      // Add more details about the event if needed
+                    );
+                  },
+                ),
     );
   }
 }

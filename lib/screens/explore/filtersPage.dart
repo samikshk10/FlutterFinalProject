@@ -35,7 +35,7 @@ class _FiltersPageState extends State<FiltersPage> {
               child: ListView(
                 children: [
                   FilterGroup(title: 'Categories', filters: _categories),
-                  FilterGroup(title: 'Event type', filters: _categories),
+                  // FilterGroup(title: 'Event type', filters: _categories),
                 ],
               ),
             ),

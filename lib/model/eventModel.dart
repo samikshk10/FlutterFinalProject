@@ -52,4 +52,24 @@ class EventModel {
       latitude: data['latitude'],
     );
   }
+
+  factory EventModel.fromMap(Map<String, dynamic> data) {
+    return EventModel(
+      eventId: data['eventId'],
+      title: data['title'],
+      description: data['description'],
+      startDate: data['startDate'],
+      endDate: data['endDate'],
+      startTime: data['startTime'],
+      endTime: data['endTime'],
+      category: data['category'],
+      imageUrl: data['imageUrl'],
+      isOnlineEvent: data['isOnlineEvent'],
+      location: data['location'],
+      punchLine: data['punchLine'],
+      longitude: data['longitude'],
+      latitude: data['latitude'], // Assuming name is a field in the map
+      // Initialize other properties from the map here
+    );
+  }
 }
