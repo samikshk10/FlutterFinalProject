@@ -15,7 +15,6 @@ class UserProfile extends StatefulWidget {
 }
 
 class _UserProfileState extends State<UserProfile> {
-  Uint8List? _image;
   String? displayName = FirebaseAuth.instance.currentUser?.displayName;
   void didUpdateWidget(UserProfile oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -43,9 +42,12 @@ class _UserProfileState extends State<UserProfile> {
             SizedBox(height: 30),
             Stack(
               children: [
-                _image != null
+                FirebaseAuth.instance.currentUser?.photoURL != null
                     ? CircleAvatar(
-                        radius: 65, backgroundImage: MemoryImage(_image!))
+                        radius: 65,
+                        backgroundImage: NetworkImage(
+                            FirebaseAuth.instance.currentUser?.photoURL ??
+                                "sd"))
                     : CircleAvatar(
                         radius: 65,
                         backgroundImage: AssetImage('assets/images/admin.png'),
