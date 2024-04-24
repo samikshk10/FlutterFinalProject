@@ -65,7 +65,7 @@ class _UserProfileState extends State<UserProfile> {
                     (FirebaseAuth.instance.currentUser != null
                         ? displayName ?? "User"
                         : "User"),
-                    style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   IconButton(
                       onPressed: () async {

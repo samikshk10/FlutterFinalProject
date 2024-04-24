@@ -40,7 +40,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _fetchPopularEvents(); // Call _fetchPopularEvents in initState to load popular events initially
+    _fetchPopularEvents();
   }
 
   Future<List<Event>> _fetchPopularEvents() async {
