@@ -38,12 +38,13 @@ class MyApp extends StatelessWidget {
               backgroundColor: Colors.purple,
               titleTextStyle: TextStyle(fontSize: 24, color: Colors.white)),
         ),
-        initialRoute: '/',
+        initialRoute: '/admin',
         routes: {
           '/': (context) => LoginScreen(),
           '/signup': (context) => SignUpScreen(),
           '/home': (context) => PageRender(),
-          '/addevent': (context) => AddEventScreen()
+          '/addevent': (context) => AddEventScreen(),
+          '/admin': (context) => AdminPage(),
         },
       ),
     );
