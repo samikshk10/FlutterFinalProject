@@ -5,6 +5,7 @@ import 'package:flutterprojectfinal/model/eventModel.dart';
 import 'package:flutterprojectfinal/screens/profile/favouritePage.dart';
 import 'package:flutterprojectfinal/services/provider/favouriteProvider.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 class CardPopularEvent extends StatefulWidget {
   final EventModel eventModel;
@@ -44,7 +45,7 @@ class _CardPopularEventState extends State<CardPopularEvent> {
           borderRadius: BorderRadius.circular(16),
           child: Stack(
             children: [
-              Image.asset(
+              Image.network(
                 widget.eventModel.imageUrl,
                 fit: BoxFit.cover,
                 width: double.infinity,
@@ -64,9 +65,12 @@ class _CardPopularEventState extends State<CardPopularEvent> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(widget.eventModel.startDate),
+                      Text(DateFormat('dd')
+                          .format(DateTime.parse(widget.eventModel.startDate))),
                       Text(
-                        widget.eventModel.endDate,
+                        DateFormat('MMM')
+                            .format(DateTime.parse(widget.eventModel.startDate))
+                            .toUpperCase(),
                         style: const TextStyle(
                           color: AppColors.primaryColor,
                         ),
@@ -126,30 +130,6 @@ class _CardPopularEventState extends State<CardPopularEvent> {
                       ],
                     ),
                   ),
-                  // FutureBuilder<bool>(
-                  //   future: provider.isExist(eventModel),
-                  //   builder: (context, snapshot) {
-                  //     if (snapshot.connectionState == ConnectionState.waiting) {
-                  //       // Return a loading indicator while waiting for the result
-                  //       return CircularProgressIndicator();
-                  //     } else if (snapshot.hasError) {
-                  //       // Handle error
-                  //       return Icon(
-                  //           Icons.error); // Or any other error indicator
-                  //     } else {
-                  //       final bool isFavorite = snapshot.data!;
-                  //       return CircleButton(
-                  //         icon: Icon(
-                  //           isFavorite ? Icons.favorite : Icons.favorite_border,
-                  //           color: isFavorite ? Colors.red : null,
-                  //         ),
-                  //         onTap: () {
-                  //           provider.toggleFavourite(eventModel);
-                  //         },
-                  //       );
-                  //     }
-                  //   },
-                  // ),
                 ],
               ),
             );

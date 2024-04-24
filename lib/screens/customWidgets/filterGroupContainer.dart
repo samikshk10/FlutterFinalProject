@@ -40,7 +40,8 @@ class _FilterGroupState extends State<FilterGroup> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(widget.title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          Text(widget.title,
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           SizedBox(height: 8),
           GridView.builder(
             shrinkWrap: true,
@@ -72,7 +73,9 @@ class _FilterGroupState extends State<FilterGroup> {
 class FilterButton extends StatefulWidget {
   final Category filterName;
   final List<String> addedFilters; // Receive the list here
-  const FilterButton({Key? key, required this.filterName, required this.addedFilters}) : super(key: key);
+  const FilterButton(
+      {Key? key, required this.filterName, required this.addedFilters})
+      : super(key: key);
 
   @override
   State<FilterButton> createState() => _FilterButtonState();

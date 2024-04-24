@@ -43,9 +43,48 @@ class _HomePageState extends State<HomePage> {
     _fetchPopularEvents();
   }
 
-  Future<List<Event>> _fetchPopularEvents() async {
-    await Future.delayed(Duration(seconds: 2));
-    return events;
+  Future<List<EventModel>> _fetchPopularEvents() async {
+    // Wait for Firestore to return the documents from the 'favouriteevents' collection
+    QuerySnapshot favouriteSnapshot =
+        await FirebaseFirestore.instance.collection('favouriteEvents').get();
+
+    // Initialize a map to store event IDs and their corresponding like counts
+    Map<String, int> eventLikes = {};
+
+    // Iterate through the documents in the 'favouriteevents' collection
+    favouriteSnapshot.docs.forEach((doc) {
+      // Extract the event ID from each document
+      String eventId = doc['event'];
+
+      print("event>>> $eventId");
+      // Increment the like count for the corresponding event ID
+      eventLikes[eventId] = (eventLikes[eventId] ?? 0) + 1;
+    });
+
+    // Sort the event IDs based on their like counts in descending order
+    List<String> sortedEventIds = eventLikes.keys.toList()
+      ..sort((a, b) => eventLikes[b]!.compareTo(eventLikes[a]!));
+
+    // Limit the result to the top 5 event IDs
+    sortedEventIds = sortedEventIds.take(5).toList();
+
+    if (sortedEventIds.isNotEmpty) {
+      // Query the 'events' collection based on the top 5 event IDs
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('events')
+          .where('eventId', whereIn: sortedEventIds)
+          .get();
+
+      // Map the query results to EventModel objects
+      List<EventModel> popularEvents = querySnapshot.docs
+          .map((doc) => EventModel.fromFirestore(doc))
+          .toList();
+
+      return popularEvents;
+    } else {
+      // Handle case when no popular events are found
+      return [];
+    }
   }
 
   void _onRefresh() async {
@@ -359,24 +398,26 @@ class _HomePageState extends State<HomePage> {
       );
 
   Widget _popularEventsBuilder() {
-    return FutureBuilder<List<Event>>(
+    return FutureBuilder<List<EventModel>>(
       future: _fetchPopularEvents(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           return Center(child: Text(snapshot.error.toString()));
-        } else if (snapshot.hasData) {
-          List<Event> events = snapshot.data as List<Event>;
-          return _listPopularEvent(events);
         } else {
-          return const Center(child: Text("No events found."));
+          List<EventModel> events = snapshot.data ?? [];
+          if (events.isEmpty) {
+            return Center(child: Text("No Popular events found"));
+          } else {
+            return _listPopularEvent(events);
+          }
         }
       },
     );
   }
 
-  Widget _listPopularEvent(List<Event> events) => Container(
+  Widget _listPopularEvent(List<EventModel> events) => Container(
         width: double.infinity, // or set a specific width
         height: 270,
         padding: const EdgeInsets.all(16),
@@ -390,12 +431,20 @@ class _HomePageState extends State<HomePage> {
               width: 250,
               height: 270,
               child: GestureDetector(
-                onTap: () => Navigator.pushNamed(
-                  context,
-                  '/signup', // Make sure this is the correct route
-                  arguments: events[index],
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => DetailPage(
+                        key: Key('event_details_${events[index].title}'),
+                        eventModel: events[index],
+                        provider: Provider.of<FavouriteProvider>(context),
+                      ),
+                    ),
+                  );
+                },
+                child: CardPopularEvent(
+                  eventModel: events[index],
                 ),
-                child: Text("hello"),
               ),
             ),
           ),
