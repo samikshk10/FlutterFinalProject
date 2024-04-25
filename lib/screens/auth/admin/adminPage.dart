@@ -1,6 +1,10 @@
 import 'package:firebase_core/firebase_core.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterprojectfinal/screens/auth/admin/dashboard.dart';
+import 'package:flutterprojectfinal/screens/auth/admin/manageEventsPage.dart';
+import 'package:flutterprojectfinal/screens/auth/admin/manageUsersPage.dart';
+import 'package:flutterprojectfinal/screens/auth/admin/settingsPage.dart';
 
 class AdminPage extends StatefulWidget {
   @override
@@ -9,7 +13,7 @@ class AdminPage extends StatefulWidget {
 
 class _AdminPageState extends State<AdminPage> {
   String _currentPage = 'Dashboard';
-  late FirebaseFirestore _firestore; // Declare Firestore instance
+  late FirebaseFirestore _firestore;
   int _numberOfUsers = 0;
   int _numberOfEvents = 0;
   int _numberOfOrganizers = 0;
@@ -30,7 +34,6 @@ class _AdminPageState extends State<AdminPage> {
 
   Future<void> _fetchData() async {
     try {
-      // Fetch data from Firestore collections
       QuerySnapshot usersSnapshot = await _firestore.collection('users').get();
       QuerySnapshot eventsSnapshot =
           await _firestore.collection('events').get();
@@ -57,6 +60,24 @@ class _AdminPageState extends State<AdminPage> {
 
   @override
   Widget build(BuildContext context) {
+    Widget pageContent;
+    switch (_currentPage) {
+      case 'Dashboard':
+        pageContent = DashboardPage();
+        break;
+      case 'Manage Events':
+        pageContent = ManageEventsPage();
+        break;
+      case 'Manage Users':
+        pageContent = ManageUsersPage();
+        break;
+      case 'Settings':
+        pageContent = SettingsPage();
+        break;
+      default:
+        pageContent = DashboardPage();
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Admin Page - $_currentPage'),
@@ -96,132 +117,13 @@ class _AdminPageState extends State<AdminPage> {
           ],
         ),
       ),
-      body: _buildPageContent(),
+      body: _isLoading ? _buildLoadingIndicator() : pageContent,
     );
   }
 
-  Widget _buildPageContent() {
-    if (_isLoading) {
-      return Center(
-        child: CircularProgressIndicator(),
-      );
-    } else {
-      switch (_currentPage) {
-        case 'Manage Events':
-          return _buildManageEventsPage();
-        case 'Manage Users':
-          return _buildManageUsersPage();
-        case 'Settings':
-          return _buildSettingsPage();
-        default:
-          return _buildDashboardPage();
-      }
-    }
-  }
-
-  Widget _buildDashboardPage() {
+  Widget _buildLoadingIndicator() {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Card(
-            elevation: 5,
-            margin: EdgeInsets.all(10),
-            child: Padding(
-              padding: EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Number of Users',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    '$_numberOfUsers',
-                    style: TextStyle(
-                      fontSize: 18,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Card(
-            elevation: 5,
-            margin: EdgeInsets.all(10),
-            child: Padding(
-              padding: EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Number of Events',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    '$_numberOfEvents',
-                    style: TextStyle(
-                      fontSize: 18,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Card(
-            elevation: 5,
-            margin: EdgeInsets.all(10),
-            child: Padding(
-              padding: EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Number of Organizers',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    '$_numberOfOrganizers',
-                    style: TextStyle(
-                      fontSize: 18,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildManageEventsPage() {
-    return Center(
-      child: Text('Manage Events Page'),
-    );
-  }
-
-  Widget _buildManageUsersPage() {
-    return Center(
-      child: Text('Manage Users Page'),
-    );
-  }
-
-  Widget _buildSettingsPage() {
-    return Center(
-      child: Text('Settings Page'),
+      child: CircularProgressIndicator(),
     );
   }
 }

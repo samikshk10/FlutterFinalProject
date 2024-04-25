@@ -3,7 +3,11 @@ import 'dart:typed_data';
 import 'package:ez_validator/ez_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+<<<<<<< HEAD
 import 'package:flutterprojectfinal/screens/organizer/addorganizer.dart';
+=======
+import 'package:flutterprojectfinal/screens/profile/changePassword.dart';
+>>>>>>> 563f94f2de2e6279b90dd280175f5c4593453fb9
 import 'package:flutterprojectfinal/screens/profile/editProfile.dart';
 import 'package:flutterprojectfinal/screens/profile/favouritePage.dart';
 import 'package:flutterprojectfinal/utils/constant.dart';
@@ -65,7 +69,7 @@ class _UserProfileState extends State<UserProfile> {
                     (FirebaseAuth.instance.currentUser != null
                         ? displayName ?? "User"
                         : "User"),
-                    style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   IconButton(
                       onPressed: () async {
@@ -117,9 +121,14 @@ class _UserProfileState extends State<UserProfile> {
             ),
             SizedBox(height: 10),
             ListTile(
-              title: Text('Settings'),
+              title: Text('Change Password'),
               tileColor: lightGray,
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ChangePasswordPage()));
+              },
               leading: Icon(Icons.settings),
               trailing: Icon(Icons.arrow_forward_ios_outlined),
             ),
