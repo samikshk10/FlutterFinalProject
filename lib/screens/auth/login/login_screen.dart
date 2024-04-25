@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterprojectfinal/events/add_events/add_events.dart';
 import 'package:flutterprojectfinal/screens/auth/forgotpassword/forgotpassword.dart';
 import 'package:flutterprojectfinal/screens/auth/signup/signup_screen.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/customButton.dart';
@@ -9,6 +11,7 @@ import 'package:flutterprojectfinal/services/auth.dart';
 import 'package:flutterprojectfinal/ui/homepage/page_render.dart';
 import 'package:flutterprojectfinal/utils/constant.dart';
 import 'package:flutterprojectfinal/validators/authValidators.dart';
+import 'package:flutterprojectfinal/widgets/globalwidget/flashmessage.dart';
 import 'package:toastification/toastification.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -31,9 +34,21 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       String email = _emailController.text.toString().trim();
       String pass = _passwordController.text.toString().trim();
-      var response = await AuthMethods.loginWithEmailAndPassword(
+      var response;
+      response = await AuthMethods.loginWithEmailAndPassword(
           dialogcontext, email, pass);
+      if (isSwitched) {
+        response = await AuthMethods.checkOrganiser(email);
+      }
       if (response == "success") {
+        if (isSwitched) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AddEventScreen(),
+            ),
+          );
+        }
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -47,20 +62,15 @@ class _LoginScreenState extends State<LoginScreen> {
           autoCloseDuration: const Duration(seconds: 5),
         );
       }
-    } on FirebaseAuthException catch (e) {
-      print(e.code + "this is code");
-      print(e.message);
-      if (e.code == 'user-not-found') {
-        print('No user found for that email.');
-      } else if (e.code == 'invalid-credential') {
-        print('Wrong password provided for that user.');
-      }
+    } catch (error) {
+      print(error);
     }
   }
 
-  handleGoogleSignIn(BuildContext context) async {
+  void handleGoogleSignIn(BuildContext context) async {
     var response = await AuthMethods.signInWithGoogle();
-    print(response);
+    print("thissss>>>>>> $response");
+
     if (response == "success") {
       Navigator.pushReplacement(
         context,
@@ -171,7 +181,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 style: TextStyle(fontSize: 20),
               ),
               CustomButton(
-                  label: 'SignUp',
+                  label: Text(
+                    "Sign Up",
+                    style: TextStyle(fontSize: 24, color: Colors.white),
+                  ),
                   press: () {
                     Navigator.push(
                         context,
@@ -206,7 +219,10 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               SizedBox(height: 24),
               CustomButton(
-                label: 'Login',
+                label: Text(
+                  "Login",
+                  style: TextStyle(fontSize: 24, color: Colors.white),
+                ),
                 press: () {
                   if (_formKey.currentState!.validate()) {
                     handleLogin(context);

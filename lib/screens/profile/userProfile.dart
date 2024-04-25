@@ -125,7 +125,12 @@ class _UserProfileState extends State<UserProfile> {
             ),
             SizedBox(height: 10),
             Expanded(child: SizedBox()),
-            CustomButton(label: 'Logout', press: _logout)
+            CustomButton(
+                label: Text(
+                  "Logout",
+                  style: TextStyle(fontSize: 24, color: Colors.white),
+                ),
+                press: _logout)
           ],
         ),
       ),

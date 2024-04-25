@@ -16,6 +16,10 @@ class AuthMethods {
 
       auth.UserCredential result = await auth.FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
+      if (!result.user!.emailVerified) {
+        return "Please verify your email";
+      }
+
       Provider.of<UserCredentialProvider>(context, listen: false)
           .setUserCredential(result);
 
@@ -43,6 +47,31 @@ class AuthMethods {
     }
   }
 
+  static Future<dynamic> checkOrganiser(String email) async {
+    try {
+      QuerySnapshot querySnapshot = await firestore
+          .collection('organizers')
+          .where('email', isEqualTo: email)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot doc = querySnapshot.docs.first;
+
+        if (doc["status"] == "not verified") {
+          return "Your organizer request  is yet approved";
+        } else if (doc["status"] == "rejected") {
+          return "Your organizer request has been rejected";
+        } else if (doc["status"] == "verified") {
+          return "success";
+        }
+      } else {
+        return "This email doesnt belong to organizer";
+      }
+    } catch (e) {
+      return "Some error occured";
+    }
+  }
+
   static Future<dynamic> signupEmailandPassword(
       String email, String password, String username) async {
     print(email + password);
@@ -51,8 +80,9 @@ class AuthMethods {
         auth.UserCredential userCred = await auth.FirebaseAuth.instance
             .createUserWithEmailAndPassword(email: email, password: password);
         await userCred.user!.updateDisplayName(username);
+        await userCred.user!.sendEmailVerification();
 
-        return "signup successfully";
+        return "success";
       } else {
         return "Please enter email and password";
       }
@@ -60,9 +90,9 @@ class AuthMethods {
       print(e.code + "this is code");
       print(e.message);
       if (e.code == 'user-not-found') {
-        print('No user found for that email.');
+        return 'Email not found';
       } else if (e.code == 'invalid-credential') {
-        print('Wrong password provided for that user.');
+        return ('Wrong password provided for that user');
       }
     }
   }

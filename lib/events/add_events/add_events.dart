@@ -653,15 +653,18 @@ class _AddEventScreenState extends State<AddEventScreen> {
                   ],
                 ),
               ),
-              isLoading
-                  ? CircularProgressIndicator()
-                  : CustomButton(
-                      label: 'Add Event',
-                      press: () {
-                        if (_formKey.currentState!.validate()) {
-                          _addEvent();
-                        }
-                      }),
+              CustomButton(
+                  label: isLoading
+                      ? CircularProgressIndicator()
+                      : Text(
+                          "Add Event",
+                          style: TextStyle(fontSize: 24, color: Colors.white),
+                        ),
+                  press: () {
+                    if (_formKey.currentState!.validate()) {
+                      _addEvent();
+                    }
+                  }),
             ],
           ),
         ),

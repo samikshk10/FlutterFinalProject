@@ -8,7 +8,7 @@ class CustomButton extends StatelessWidget {
   }) : super(key: key);
 
   final Function press;
-  final String label;
+  final Widget label;
 
   @override
   Widget build(BuildContext context) {
@@ -21,12 +21,7 @@ class CustomButton extends StatelessWidget {
         child: Container(
           width: MediaQuery.of(context).size.width / 3,
           height: 52,
-          child: Center(
-            child: Text(
-              label,
-              style: TextStyle(fontSize: 24, color: Colors.white),
-            ),
-          ),
+          child: Center(child: label),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(28.0),
             gradient: LinearGradient(

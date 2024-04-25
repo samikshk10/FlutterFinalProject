@@ -135,7 +135,10 @@ class _AddOrganizerScreenState extends State<AddOrganizerScreen> {
               isLoading
                   ? CircularProgressIndicator()
                   : CustomButton(
-                      label: 'Send Request',
+                      label: Text(
+                        "Send Request",
+                        style: TextStyle(fontSize: 24, color: Colors.white),
+                      ),
                       press: () {
                         if (_formKey.currentState!.validate()) {
                           _addOrganizer();
