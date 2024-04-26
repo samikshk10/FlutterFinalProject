@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
               backgroundColor: Colors.purple,
               titleTextStyle: TextStyle(fontSize: 24, color: Colors.white)),
         ),
-        initialRoute: '/admin',
+        initialRoute: '/',
         routes: {
           '/': (context) => LoginScreen(),
           '/signup': (context) => SignUpScreen(),

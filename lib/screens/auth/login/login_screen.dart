@@ -93,7 +93,7 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               SizedBox(height: 72),
               Text(
-                "Login",
+                "Welcome to EventSphere!",
                 style: TextStyle(fontSize: 24, color: gray),
               ),
               SizedBox(height: 32),
@@ -141,19 +141,35 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
               ),
-              SizedBox(height: 32),
-              Text(
-                "Don't have an account?",
-                style: TextStyle(fontSize: 20),
-              ),
-              CustomButton(
-                  label: 'SignUp',
-                  press: () {
+              Align(
+                child: GestureDetector(
+                  onTap: () {
                     Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => SignUpScreen()));
-                  }),
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ResetPassword(
+                            email: _emailController.text.toString().trim()),
+                      ),
+                    );
+                  },
+                  child: Text(
+                    "Forgot Password?",
+                    style: TextStyle(
+                      color: Colors.blue,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              CustomButton(
+                label: 'Login',
+                press: () {
+                  if (_formKey.currentState!.validate()) {
+                    handleLogin(context);
+                  }
+                },
+              ),
               Text('Or continue with:'),
               SizedBox(height: 10),
               GoogleSignInButton(
@@ -162,33 +178,32 @@ class _LoginScreenState extends State<LoginScreen> {
                 },
               ),
               SizedBox(height: 8),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ResetPassword(
-                          email: _emailController.text.toString().trim()),
-                    ),
-                  );
-                },
-                child: Text(
-                  "Forgot Password?",
-                  style: TextStyle(
-                    color: Colors.blue,
-                    decoration: TextDecoration.underline,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Don't have an account?",
                   ),
-                ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SignUpScreen(),
+                        ),
+                      );
+                    },
+                    child: Text(
+                      "Sign Up",
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.blue,
+                      ),
+                    ),
+                  ),
+                ],
               ),
               SizedBox(height: 24),
-              CustomButton(
-                label: 'Login',
-                press: () {
-                  if (_formKey.currentState!.validate()) {
-                    handleLogin(context);
-                  }
-                },
-              )
             ],
           ),
         ),

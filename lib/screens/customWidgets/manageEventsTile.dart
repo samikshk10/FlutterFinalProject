@@ -20,7 +20,7 @@ class ManageEventsTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dismissible(
-      key: Key(title), // Unique key for each tile
+      key: Key(title),
       background: Container(
         color: Colors.red,
         alignment: Alignment.centerRight,
@@ -33,13 +33,16 @@ class ManageEventsTile extends StatelessWidget {
       direction: DismissDirection.endToStart,
       confirmDismiss: (_) => confirmDelete(context),
       onDismissed: (_) => onDelete(),
-      child: ListTile(
-        onTap: () => onTap(),
-        leading: CircleAvatar(
-          backgroundImage: NetworkImage(imageUrl),
+      child: Card(
+        elevation: 5,
+        child: ListTile(
+          onTap: () => onTap(),
+          leading: CircleAvatar(
+            backgroundImage: NetworkImage(imageUrl),
+          ),
+          title: Text(title),
+          subtitle: Text('$date\n$location'),
         ),
-        title: Text(title),
-        subtitle: Text('$date\n$location'),
       ),
     );
   }
