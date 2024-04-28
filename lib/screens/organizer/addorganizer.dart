@@ -46,7 +46,7 @@ class _AddOrganizerScreenState extends State<AddOrganizerScreen> {
       'websiteUrl': _websiteController.text,
       'email': FirebaseAuth.instance.currentUser!.email,
       'name': FirebaseAuth.instance.currentUser!.displayName,
-      'status': 'not verified',
+      'status': 'pending',
       'createdAt': FieldValue.serverTimestamp(),
     }).then((value) {
       // Show success message or navigate to another screen

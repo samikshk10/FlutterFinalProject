@@ -1,10 +1,14 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojectfinal/screens/auth/admin/dashboard.dart';
 import 'package:flutterprojectfinal/screens/auth/admin/manageEventsPage.dart';
 import 'package:flutterprojectfinal/screens/auth/admin/manageUsersPage.dart';
+import 'package:flutterprojectfinal/screens/auth/admin/organizer/organizer_request.dart';
 import 'package:flutterprojectfinal/screens/auth/admin/settingsPage.dart';
+import 'package:flutterprojectfinal/screens/auth/auth_page.dart';
+import 'package:flutterprojectfinal/services/auth.dart';
 
 class AdminPage extends StatefulWidget {
   @override
@@ -60,20 +64,22 @@ class _AdminPageState extends State<AdminPage> {
 
   @override
   Widget build(BuildContext context) {
-    Widget pageContent;
+    Widget? pageContent;
     switch (_currentPage) {
       case 'Dashboard':
         pageContent = DashboardPage();
         break;
-      case 'Manage Events':
-        pageContent = ManageEventsPage();
-        break;
+
       case 'Manage Users':
-        pageContent = ManageUsersPage();
+        pageContent = Container();
         break;
-      case 'Settings':
-        pageContent = SettingsPage();
+      case 'Organizer Request':
+        pageContent = OrganizerRequestCard();
         break;
+      case 'LogOut':
+        pageContent = Container();
+        break;
+
       default:
         pageContent = DashboardPage();
     }
@@ -103,17 +109,20 @@ class _AdminPageState extends State<AdminPage> {
               onTap: () => _navigateTo('Dashboard'),
             ),
             ListTile(
-              title: Text('Manage Events'),
-              onTap: () => _navigateTo('Manage Events'),
-            ),
-            ListTile(
               title: Text('Manage Users'),
               onTap: () => _navigateTo('Manage Users'),
             ),
             ListTile(
-              title: Text('Settings'),
-              onTap: () => _navigateTo('Settings'),
+              title: Text('Organizer Request'),
+              onTap: () => _navigateTo('Organizer Request'),
             ),
+            ListTile(
+                title: Text("Logout"),
+                onTap: () async {
+                  print("hello");
+                  Navigator.pushReplacement(context,
+                      MaterialPageRoute(builder: (context) => Authpage()));
+                }),
           ],
         ),
       ),

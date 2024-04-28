@@ -198,6 +198,11 @@ class DetailPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          ElevatedButton.icon(
+              onPressed: () {},
+              icon: Icon(Icons.category_outlined),
+              label: Text(eventModel.category)),
+          SizedBox(height: 20),
           const Text(
             "Description",
             style: TextStyle(
@@ -278,7 +283,7 @@ class DetailPage extends StatelessWidget {
       children: [
         Text(eventModel.location ?? "location not specified"),
         Container(
-          height: 200,
+          height: 250,
           child: SfMaps(
             layers: [
               MapTileLayer(

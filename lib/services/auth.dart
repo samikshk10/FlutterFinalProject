@@ -19,9 +19,8 @@ class AuthMethods {
       if (!result.user!.emailVerified) {
         return "Please verify your email";
       }
-
       Provider.of<UserCredentialProvider>(context, listen: false)
-          .setUserCredential(result);
+          .setUserCredential(result, false);
 
       return res = "success";
     } on auth.FirebaseAuthException catch (exception, s) {
@@ -47,6 +46,28 @@ class AuthMethods {
     }
   }
 
+  static Future<dynamic> checkAdmin(String email, String password) async {
+    try {
+      QuerySnapshot querySnapshot = await firestore
+          .collection('admin')
+          .where('email', isEqualTo: email)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot doc = querySnapshot.docs.first;
+        if (doc['password'] == password) {
+          return "success";
+        } else {
+          return "incorrect email or password";
+        }
+      } else {
+        return "This email doesnt belong to admin";
+      }
+    } catch (e) {
+      return "Some error occured";
+    }
+  }
+
   static Future<dynamic> checkOrganiser(String email) async {
     try {
       QuerySnapshot querySnapshot = await firestore
@@ -57,11 +78,11 @@ class AuthMethods {
       if (querySnapshot.docs.isNotEmpty) {
         DocumentSnapshot doc = querySnapshot.docs.first;
 
-        if (doc["status"] == "not verified") {
+        if (doc["status"] == "pending") {
           return "Your organizer request  is yet approved";
         } else if (doc["status"] == "rejected") {
           return "Your organizer request has been rejected";
-        } else if (doc["status"] == "verified") {
+        } else if (doc["status"] == "approved") {
           return "success";
         }
       } else {
@@ -74,9 +95,16 @@ class AuthMethods {
 
   static Future<dynamic> signupEmailandPassword(
       String email, String password, String username) async {
-    print(email + password);
     try {
       if (email.isNotEmpty && password.isNotEmpty && username.isNotEmpty) {
+        QuerySnapshot querySnapshot = await firestore
+            .collection('admin')
+            .where('email', isEqualTo: email)
+            .get();
+
+        if (querySnapshot.docs.isNotEmpty) {
+          return "this email is already registered ";
+        }
         auth.UserCredential userCred = await auth.FirebaseAuth.instance
             .createUserWithEmailAndPassword(email: email, password: password);
         await userCred.user!.updateDisplayName(username);
@@ -97,7 +125,7 @@ class AuthMethods {
     }
   }
 
-  static Future<dynamic> signInWithGoogle() async {
+  static Future<dynamic> signInWithGoogle(BuildContext context) async {
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
     final GoogleSignInAuthentication? googleAuth =
         await googleUser?.authentication;
@@ -107,8 +135,10 @@ class AuthMethods {
     );
     final auth.UserCredential userCredential =
         await auth.FirebaseAuth.instance.signInWithCredential(credential);
-    print(userCredential.user?.displayName);
-    return 'success';
+    Provider.of<UserCredentialProvider>(context, listen: false)
+        .setUserCredential(userCredential, false);
+
+    return 'successs';
   }
 
   Future<void> sendPasswordResetEmail(String email) async {

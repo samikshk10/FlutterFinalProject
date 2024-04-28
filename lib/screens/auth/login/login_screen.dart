@@ -2,16 +2,20 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojectfinal/events/add_events/add_events.dart';
+import 'package:flutterprojectfinal/screens/auth/admin/adminPage.dart';
 import 'package:flutterprojectfinal/screens/auth/forgotpassword/forgotpassword.dart';
 import 'package:flutterprojectfinal/screens/auth/signup/signup_screen.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/customButton.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/formField.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/googleSignInButton.dart';
 import 'package:flutterprojectfinal/services/auth.dart';
+import 'package:flutterprojectfinal/services/provider/userCredentialProvider.dart';
 import 'package:flutterprojectfinal/ui/homepage/page_render.dart';
 import 'package:flutterprojectfinal/utils/constant.dart';
 import 'package:flutterprojectfinal/validators/authValidators.dart';
 import 'package:flutterprojectfinal/widgets/globalwidget/flashmessage.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toastification/toastification.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -34,14 +38,33 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       String email = _emailController.text.toString().trim();
       String pass = _passwordController.text.toString().trim();
+
       var response;
+      response = await AuthMethods.checkAdmin(email, pass);
+      if (response == "success") {
+        SharedPreferences preferences = await SharedPreferences.getInstance();
+        preferences.setBool("isOrganizer", isSwitched);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AdminPage(),
+          ),
+        );
+      }
+
       response = await AuthMethods.loginWithEmailAndPassword(
           dialogcontext, email, pass);
       if (isSwitched) {
         response = await AuthMethods.checkOrganiser(email);
       }
+
       if (response == "success") {
+        SharedPreferences preferences = await SharedPreferences.getInstance();
+        preferences.setBool("isOrganizer", isSwitched);
+        preferences.setBool("isLoggedIn", true);
+
         if (isSwitched) {
+          print("is Swwitched $isSwitched");
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
@@ -52,7 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => PageRender(),
+            builder: (context) => PageRender(isLoggedInAsOrganizer: isSwitched),
           ),
         );
       } else {
@@ -68,16 +91,36 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void handleGoogleSignIn(BuildContext context) async {
-    var response = await AuthMethods.signInWithGoogle();
-    print("thissss>>>>>> $response");
+    var response;
+    await AuthMethods.signInWithGoogle(context);
+    if (isSwitched) {
+      UserCredential? userCredential =
+          Provider.of<UserCredentialProvider>(context, listen: false)
+              .userCredential;
+      response =
+          await AuthMethods.checkOrganiser(userCredential?.user?.email ?? "");
+    }
+    print("hello there $response");
 
     if (response == "success") {
+      print("hello");
+      SharedPreferences preferences = await SharedPreferences.getInstance();
+      preferences.setBool("isOrganizer", isSwitched);
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => PageRender(),
+          builder: (context) => PageRender(
+            isLoggedInAsOrganizer: isSwitched,
+          ),
         ),
       );
+    } else {
+      toastification.show(
+        context: context,
+        title: Text(response),
+        autoCloseDuration: const Duration(seconds: 5),
+      );
+      return;
     }
   }
 

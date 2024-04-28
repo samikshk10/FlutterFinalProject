@@ -55,6 +55,7 @@ dependencies:
   pull_to_refresh: ^2.0.0
   syncfusion_flutter_maps: ^25.1.40
   firebase_database: ^10.5.2
+  shared_preferences: ^2.2.3
 
 dev_dependencies:
   flutter_test:

@@ -120,6 +120,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         controller: _passwordController,
                         label: 'Password',
                         prefix: Icons.lock,
+                        maxLines: 1,
                         isPassword: isPasswordVisible,
                         suffix: isPasswordVisible
                             ? Icons.visibility

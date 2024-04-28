@@ -3,15 +3,13 @@ import 'dart:typed_data';
 import 'package:ez_validator/ez_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-<<<<<<< HEAD
 import 'package:flutterprojectfinal/screens/organizer/addorganizer.dart';
-=======
 import 'package:flutterprojectfinal/screens/profile/changePassword.dart';
->>>>>>> 563f94f2de2e6279b90dd280175f5c4593453fb9
 import 'package:flutterprojectfinal/screens/profile/editProfile.dart';
 import 'package:flutterprojectfinal/screens/profile/favouritePage.dart';
 import 'package:flutterprojectfinal/utils/constant.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/customButton.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserProfile extends StatefulWidget {
   const UserProfile({super.key});
@@ -21,6 +19,8 @@ class UserProfile extends StatefulWidget {
 
 class _UserProfileState extends State<UserProfile> {
   String? displayName = FirebaseAuth.instance.currentUser?.displayName;
+
+  bool? isOrganizer = false;
   void didUpdateWidget(UserProfile oldWidget) {
     super.didUpdateWidget(oldWidget);
     setState(() {
@@ -29,9 +29,26 @@ class _UserProfileState extends State<UserProfile> {
     print('First Screen is visible again');
   }
 
+  @override
+  void initState() {
+    super.initState();
+    checkOrganizer();
+  }
+
+  void checkOrganizer() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    setState(() {
+      isOrganizer = preferences.getBool("isOrganizer") ?? false;
+    });
+  }
+
   void _logout() async {
     try {
-      await FirebaseAuth.instance.signOut();
+      await FirebaseAuth.instance.signOut().then((value) async {
+        SharedPreferences pref = await SharedPreferences.getInstance();
+        pref.clear();
+      });
+
       Navigator.pushReplacementNamed(context, '/');
     } catch (e) {
       print("Error occurred during logout: $e");
@@ -65,11 +82,14 @@ class _UserProfileState extends State<UserProfile> {
                   SizedBox(
                     width: 100,
                   ),
-                  Text(
-                    (FirebaseAuth.instance.currentUser != null
-                        ? displayName ?? "User"
-                        : "User"),
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  Center(
+                    child: Text(
+                      (FirebaseAuth.instance.currentUser != null
+                          ? displayName ?? "User"
+                          : "User"),
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
                   ),
                   IconButton(
                       onPressed: () async {
@@ -96,18 +116,20 @@ class _UserProfileState extends State<UserProfile> {
             SizedBox(
               height: 40,
             ),
-            ListTile(
-              title: Text('Be a Organizer'),
-              tileColor: lightGray,
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => AddOrganizerScreen()));
-              },
-              leading: Icon(Icons.person_add_alt_1_rounded),
-              trailing: Icon(Icons.arrow_forward_ios_outlined),
-            ),
+            isOrganizer ?? false
+                ? SizedBox.shrink()
+                : ListTile(
+                    title: Text('Be a Organizer'),
+                    tileColor: lightGray,
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => AddOrganizerScreen()));
+                    },
+                    leading: Icon(Icons.person_add_alt_1_rounded),
+                    trailing: Icon(Icons.arrow_forward_ios_outlined),
+                  ),
             SizedBox(height: 10),
             ListTile(
               title: Text('Following'),

@@ -4,7 +4,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojectfinal/model/event.dart';
 import 'package:flutterprojectfinal/model/eventModel.dart';
+import 'package:flutterprojectfinal/screens/customWidgets/manageEventsTile.dart';
 import 'package:flutterprojectfinal/services/provider/favouriteProvider.dart';
+import 'package:flutterprojectfinal/ui/event_detail/event_details.dart';
 import 'package:provider/provider.dart';
 
 class FavouritePage extends StatefulWidget {
@@ -67,11 +69,25 @@ class _FavouritePageState extends State<FavouritePage> {
                   itemCount: events.length,
                   itemBuilder: (context, index) {
                     final eventId = events.keys.toList()[index];
-                    print("here $eventId");
                     final event = events[eventId]!;
-                    return ListTile(
-                      title: Text(event.title),
-                      // Add more details about the event if needed
+                    return ManageEventsTile(
+                      title: event.title,
+                      date: event.startDate,
+                      location: event.location ?? "not specified",
+                      imageUrl: event.imageUrl,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DetailPage(
+                              eventModel: events[eventId]!,
+                              provider: Provider.of<FavouriteProvider>(context),
+                              key: Key('event_details_${event.title}'),
+                            ),
+                          ),
+                        );
+                      },
+                      onDelete: () {},
                     );
                   },
                 ),

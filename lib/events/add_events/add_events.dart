@@ -48,7 +48,6 @@ class _AddEventScreenState extends State<AddEventScreen> {
   double? _longitude, _latitude;
 
   List<String> dates = [];
-  bool _isOnlineEvent = false; // Track if the event is online or offline
 
   UploadTask? uploadTask;
   List<String> categories = CategoryList().categories;
@@ -101,7 +100,6 @@ class _AddEventScreenState extends State<AddEventScreen> {
     _startTime = null;
     _endTime = null;
     _isOneDayEvent = false;
-    _isOnlineEvent = false;
     _selectedCategory = null;
     _dateErrorText = "";
     _timeErrorText = "";
@@ -163,6 +161,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
     events.add({
       'eventId': DateTime.now().millisecondsSinceEpoch.toString(),
       'title': _titleController.text,
+      'userId': FirebaseAuth.instance.currentUser!.uid,
       'description': _descriptionController.text,
       'location': _locationController.text,
       'duration': _eventDuration,
@@ -173,7 +172,6 @@ class _AddEventScreenState extends State<AddEventScreen> {
       'startTime': _startTime != null ? _startTime!.format(context) : null,
       'endTime': _endTime != null ? _endTime!.format(context) : null,
       'imageUrl': imageUrl,
-      'isOnlineEvent': _isOnlineEvent,
       'category': _selectedCategory,
       'longitude': _longitude.isNullOrEmpty ? null : _longitude,
       'latitude': _latitude.isNullOrEmpty ? null : _latitude
@@ -316,33 +314,6 @@ class _AddEventScreenState extends State<AddEventScreen> {
                       label: 'Description',
                     ),
                     SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Text("Event Type: "),
-                        Container(
-                            padding: EdgeInsets.only(left: 20),
-                            child: Text('Online')),
-                        Radio(
-                          value: true,
-                          groupValue: _isOnlineEvent,
-                          onChanged: (value) {
-                            setState(() {
-                              _isOnlineEvent = value as bool;
-                            });
-                          },
-                        ),
-                        Text('Offline'),
-                        Radio(
-                          value: false,
-                          groupValue: _isOnlineEvent,
-                          onChanged: (value) {
-                            setState(() {
-                              _isOnlineEvent = value as bool;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
 
                     // Dropdown for event categories
                     DropdownButtonFormField<String>(
@@ -381,12 +352,9 @@ class _AddEventScreenState extends State<AddEventScreen> {
                                 type: TextInputType.text,
                                 readonly: true,
                                 validate: (String? value) {
-                                  if (!_isOnlineEvent) {
-                                    final errors = eventSchema
-                                        .catchErrors({"location": value});
-                                    return errors["location"];
-                                  }
-                                  return null;
+                                  final errors = eventSchema
+                                      .catchErrors({"location": value});
+                                  return errors["location"];
                                 },
                                 label: 'Location',
                                 prefix: Icons.location_on,
