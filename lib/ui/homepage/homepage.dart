@@ -88,9 +88,15 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _onRefresh() async {
-    await _fetchEvents("All");
-    await _fetchPopularEvents();
-    _refreshController.refreshCompleted();
+    try {
+      await _fetchEvents(selectedCategoryName);
+      await _fetchPopularEvents();
+      _refreshController.refreshCompleted();
+    } catch (error) {
+      // Handle any errors that occur during refresh
+      print("Error during refresh: $error");
+      _refreshController.refreshFailed();
+    }
   }
 
   List<EventModel> LocalEvents = [];
@@ -105,7 +111,8 @@ class _HomePageState extends State<HomePage> {
       // Location services are not enabled don't continue
       // accessing the position and request users of the
       // App to enable the location services.
-      return Future.error('Location services are disabled.');
+      return Future.error(
+          'Location services are disabled. Please enable to view local events');
     }
 
     permission = await Geolocator.checkPermission();
@@ -126,9 +133,6 @@ class _HomePageState extends State<HomePage> {
       return Future.error(
           'Location permissions are permanently denied, we cannot request permissions.');
     }
-
-    // When we reach here, permissions are granted and we can
-    // continue accessing the position of the device.
     Position coordinates = await Geolocator.getCurrentPosition();
     List<Placemark> placemarks = await placemarkFromCoordinates(
         coordinates.latitude, coordinates.longitude);
@@ -138,17 +142,22 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<List<EventModel>> _fetchEvents(String? categoryName) async {
+    // Determine the updated position after turning on location services
+    Placemark place = await _determinePosition();
+    // Use the updated location to fetch events
     QuerySnapshot querySnapshot =
         await FirebaseFirestore.instance.collection('events').get();
-    Placemark place = await _determinePosition();
-
-    return querySnapshot.docs
-        .where((doc) =>
-            doc['location'].toString().split(",")[3].trim() ==
-                place.subAdministrativeArea.toString() &&
-            (categoryName == "All" || doc['category'] == categoryName))
-        .map((doc) => EventModel.fromFirestore(doc))
-        .toList();
+    if (querySnapshot.docs.isNotEmpty) {
+      return querySnapshot.docs
+          .where((doc) =>
+              doc['location'].toString().split(",")[3].trim() ==
+                  place.subAdministrativeArea.toString() &&
+              (categoryName == "All" || doc['category'] == categoryName))
+          .map((doc) => EventModel.fromFirestore(doc))
+          .toList();
+    } else {
+      return Future.error("unable to fetch events");
+    }
   }
 
   @override
@@ -261,12 +270,28 @@ class _HomePageState extends State<HomePage> {
                         } else if (snapshot.hasData) {
                           List<EventModel> events =
                               snapshot.data as List<EventModel>;
+                          if (events.length == 0) {
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Center(
+                                  child: selectedCategoryName == "All"
+                                      ? Text("No events found")
+                                      : Text(
+                                          "No events found in $selectedCategoryName category.")),
+                            );
+                          }
+
                           if (_searchQuery.isNotEmpty) {
                             events = events
                                 .where((event) => event.title
                                     .toLowerCase()
                                     .contains(_searchQuery.toLowerCase()))
                                 .toList();
+                            if (events.length == 0) {
+                              return Center(
+                                  child: Text(
+                                      "No events found for $_searchQuery"));
+                            }
                           }
                           return Column(
                             children: events.map((event) {
@@ -373,7 +398,7 @@ class _HomePageState extends State<HomePage> {
                 }),
                 decoration: InputDecoration(
                   prefixIcon: Icon(Icons.search, color: Colors.grey),
-                  hintText: "Search event...",
+                  hintText: "Search local event...",
                   hintStyle: TextStyle(
                     color: Colors.grey,
                     fontWeight: FontWeight.w400,

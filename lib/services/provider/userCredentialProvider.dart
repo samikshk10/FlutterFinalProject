@@ -6,8 +6,12 @@ class UserCredentialProvider extends ChangeNotifier {
 
   auth.UserCredential? get userCredential => _userCredential;
 
-  void setUserCredential(auth.UserCredential userCredential) {
+  bool? _isOrganizer;
+  bool? get isOrganizer => _isOrganizer;
+
+  void setUserCredential(auth.UserCredential userCredential, bool isOrganizer) {
     _userCredential = userCredential;
+    _isOrganizer = isOrganizer;
     notifyListeners();
   }
 }

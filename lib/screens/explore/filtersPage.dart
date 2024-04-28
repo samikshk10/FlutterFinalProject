@@ -41,7 +41,10 @@ class _FiltersPageState extends State<FiltersPage> {
             ),
             Expanded(child: SizedBox()),
             CustomButton(
-              label: 'Apply Filters',
+              label: Text(
+                "Apply Filters",
+                style: TextStyle(fontSize: 24, color: Colors.white),
+              ),
               press: () {
                 Navigator.pop(context);
               },

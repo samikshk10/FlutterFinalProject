@@ -4,6 +4,7 @@ import 'package:flutterprojectfinal/screens/customWidgets/formField.dart';
 import 'package:flutterprojectfinal/services/auth.dart';
 import 'package:flutterprojectfinal/utils/constant.dart';
 import 'package:flutterprojectfinal/validators/authValidators.dart';
+import 'package:flutterprojectfinal/widgets/globalwidget/flashmessage.dart';
 import 'package:toastification/toastification.dart';
 //import 'package:fluttertoast/fluttertoast.dart';
 
@@ -20,24 +21,35 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _usernameController = TextEditingController();
   bool isPasswordVisible = true;
   final _formKey = GlobalKey<FormState>();
-  void handleSignUP() {
-    print("here is");
+  bool isLoading = false;
+  void handleSignUP() async {
     // Implement SignUp
-    AuthMethods.signupEmailandPassword(_emailController.text.trim(),
-            _passwordController.text.trim(), _usernameController.text.trim())
-        .then((value) async {
-      toastification.show(
-        context: context,
-        title: Text(value),
-        autoCloseDuration: const Duration(seconds: 5),
-      );
-    }).catchError((error) {
-      toastification.show(
-        context: context,
-        title: Text(error.toString()),
-        autoCloseDuration: const Duration(seconds: 5),
-      );
+    setState(() {
+      isLoading = true;
     });
+    final response = await AuthMethods.signupEmailandPassword(
+        _emailController.text.trim(),
+        _passwordController.text.trim(),
+        _usernameController.text.trim());
+
+    if (response == "success") {
+      FlashMessage.show(context,
+          message: "Signup successfully",
+          desc: "Please verify your email",
+          isSuccess: true);
+      setState(() {
+        isLoading = false;
+      });
+      Navigator.pop(context);
+    } else {
+      FlashMessage.show(context,
+          message: response.toString(),
+          desc: "Please try again",
+          isSuccess: false);
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   @override
@@ -108,6 +120,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         controller: _passwordController,
                         label: 'Password',
                         prefix: Icons.lock,
+                        maxLines: 1,
                         isPassword: isPasswordVisible,
                         suffix: isPasswordVisible
                             ? Icons.visibility
@@ -132,12 +145,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
               SizedBox(height: 32),
               SizedBox(height: 32),
               CustomButton(
-                label: 'SignUp',
+                label: isLoading
+                    ? CircularProgressIndicator()
+                    : Text(
+                        "Sign Up",
+                        style: TextStyle(fontSize: 24, color: Colors.white),
+                      ),
                 press: () {
                   if (_formKey.currentState!.validate()) {
                     print("here");
                     handleSignUP();
-                    Navigator.pop(context);
                   }
                 },
               ),

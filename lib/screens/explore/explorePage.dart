@@ -1,155 +1,140 @@
-  import 'package:cloud_firestore/cloud_firestore.dart';
-  import 'package:flutter/material.dart';
-  import 'package:flutterprojectfinal/model/eventModel.dart';
-  import 'package:flutterprojectfinal/screens/explore/filtersPage.dart';
-  import 'package:flutterprojectfinal/services/provider/favouriteProvider.dart';
-  import 'package:flutterprojectfinal/ui/event_detail/event_details.dart';
-  import 'package:flutterprojectfinal/ui/event_details/event_details_page.dart';
-  import 'package:flutterprojectfinal/ui/homepage/event_widget.dart';
-  import 'package:geocoding/geocoding.dart';
-  import 'package:provider/provider.dart';
-  import 'package:flutterprojectfinal/app_state.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:flutterprojectfinal/model/category.dart';
+import 'package:flutterprojectfinal/model/eventModel.dart';
+import 'package:flutterprojectfinal/screens/explore/filtersPage.dart';
+import 'package:flutterprojectfinal/services/provider/favouriteProvider.dart';
+import 'package:flutterprojectfinal/ui/event_detail/event_details.dart';
+import 'package:flutterprojectfinal/ui/event_details/event_details_page.dart';
+import 'package:flutterprojectfinal/ui/homepage/event_widget.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:provider/provider.dart';
+import 'package:flutterprojectfinal/app_state.dart';
 
-  class ExplorePage extends StatefulWidget {
-    const ExplorePage({super.key});
+class ExplorePage extends StatefulWidget {
+  const ExplorePage({super.key});
 
-    @override
-    State<ExplorePage> createState() => _ExplorePageState();
+  @override
+  State<ExplorePage> createState() => _ExplorePageState();
+}
+
+class _ExplorePageState extends State<ExplorePage> {
+  List<EventModel> LocalEvents = [];
+
+  String _selectedCategoryName = "All";
+
+  Future<List<EventModel>> _fetchEvents(String? categoryName) async {
+    QuerySnapshot querySnapshot =
+        await FirebaseFirestore.instance.collection('events').get();
+    if (querySnapshot.docs.isNotEmpty) {
+      return querySnapshot.docs
+          .where((doc) =>
+              (categoryName == "All" || doc['category'] == categoryName))
+          .map((doc) => EventModel.fromFirestore(doc))
+          .toList();
+    } else {
+      return Future.error("unable to fetch events");
+    }
   }
 
-  class _ExplorePageState extends State<ExplorePage> {
-    List<EventModel> LocalEvents = [];
-
-    Future<List<EventModel>> _fetchEvents() async {
-      LocalEvents.clear();
-      QuerySnapshot querySnapshot =
-          await FirebaseFirestore.instance.collection('events').get();
-
-      querySnapshot.docs.forEach((doc) {
-        LocalEvents.add(EventModel.fromFirestore(doc));
-      });
-
-      return LocalEvents;
-    }
-
-    String _status = 'Online';
-    @override
-    @override
-    Widget build(BuildContext context) {
-      return Scaffold(
-        body: ListView(
-          children: [
-            SearchBar(
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: ListView(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: SearchBar(
               leading: Icon(Icons.search),
               hintText: 'Search for...',
             ),
-            RadioListTile(
-                title: Text('Offline'),
-                value: 'Offline',
-                groupValue: _status,
-                onChanged: (value) {
-                  setState(() {
-                    _status = value.toString();
-                  });
-                }),
-            RadioListTile(
-                title: Text('Online'),
-                value: 'Online',
-                groupValue: _status,
-                onChanged: (value) {
-                  setState(() {
-                    _status = value.toString();
-                  });
-                }),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => FiltersPage()));
-                      },
-                      icon: Icon(Icons.tune_sharp),
-                      label: Text('Filters')),
-                  SizedBox(
-                    width: 3,
-                  ),
-                  ElevatedButton.icon(
-                      onPressed: () {},
-                      icon: Icon(Icons.calendar_today),
-                      label: Text('Anytime')),
-                  SizedBox(
-                    width: 3,
-                  ),
-                  ElevatedButton.icon(
-                      onPressed: () {},
-                      icon: Icon(Icons.music_note),
-                      label: Text('Music')),
-                  SizedBox(
-                    width: 3,
-                  ),
-                  ElevatedButton.icon(
-                      onPressed: () {},
-                      icon: Icon(Icons.business_center),
-                      label: Text('Business')),
-                  SizedBox(
-                    width: 3,
-                  ),
-                  ElevatedButton.icon(
-                      onPressed: () {},
-                      icon: Icon(Icons.fastfood_rounded),
-                      label: Text('Food & Drinks')),
-                  SizedBox(
-                    width: 3,
-                  ),
-                  ElevatedButton.icon(
-                      onPressed: () {},
-                      icon: Icon(Icons.format_paint),
-                      label: Text('Arts')),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-            FutureBuilder<List<EventModel>>(
-              future: _fetchEvents(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text(snapshot.error.toString()));
-                } else if (snapshot.hasData) {
-                  List<EventModel> events = snapshot.data as List<EventModel>;
-                  return Column(
-                    children: events.map((event) {
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => DetailPage(
-                                key: Key('event_details_${event.title}'),
-                                eventModel: event,
-                                provider: Provider.of<FavouriteProvider>(context),
-                              ),
-                            ),
-                          );
-                        },
-                        child: EventWidget(
-                          key: Key('event_widget_${event.title}'),
-                          event: event,
+          ),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                for (final category in categories)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 4.0, top: 12.0),
+                    child: Container(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor:
+                              _selectedCategoryName == category.name
+                                  ? Colors.white
+                                  : Colors.black,
+                          backgroundColor:
+                              _selectedCategoryName == category.name
+                                  ? Colors.blue
+                                  : Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
                         ),
-                      );
-                    }).toList(),
-                  );
-                } else {
-                  return const Center(child: Text("No events found."));
-                }
-              },
+                        child: Row(children: [
+                          Icon(category.icon),
+                          SizedBox(width: 4),
+                          Text(category.name),
+                        ]),
+                        onPressed: () {
+                          setState(() {
+                            _selectedCategoryName = category.name;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+              ],
             ),
-          ],
-        ),
-      );
-    }
+          ),
+          SizedBox(height: 2),
+          FutureBuilder<List<EventModel>>(
+            future: _fetchEvents(_selectedCategoryName),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Center(child: Text(snapshot.error.toString()));
+              } else if (snapshot.hasData) {
+                List<EventModel> events = snapshot.data as List<EventModel>;
+                if (events.length == 0) {
+                  return Padding(
+                    padding: const EdgeInsets.all(50.0),
+                    child: Center(
+                        child: _selectedCategoryName == "All"
+                            ? Text("No events found")
+                            : Text(
+                                "No events found in $_selectedCategoryName category.")),
+                  );
+                }
+                return Column(
+                  children: events.map((event) {
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => DetailPage(
+                              key: Key('event_details_${event.title}'),
+                              eventModel: event,
+                              provider: Provider.of<FavouriteProvider>(context),
+                            ),
+                          ),
+                        );
+                      },
+                      child: EventWidget(
+                        key: Key('event_widget_${event.title}'),
+                        event: event,
+                      ),
+                    );
+                  }).toList(),
+                );
+              } else {
+                return const Center(child: Text("No events found."));
+              }
+            },
+          ),
+        ],
+      ),
+    );
   }
+}
