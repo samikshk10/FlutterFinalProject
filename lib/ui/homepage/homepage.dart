@@ -40,7 +40,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _fetchPopularEvents();
   }
 
   Future<List<EventModel>> _fetchPopularEvents() async {
@@ -141,6 +140,16 @@ class _HomePageState extends State<HomePage> {
     return place;
   }
 
+  Future<int> countFavorites(String eventId) async {
+    QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
+        .instance
+        .collection('favouriteEvents')
+        .where("event", isEqualTo: eventId)
+        .get();
+
+    return snapshot.size;
+  }
+
   Future<List<EventModel>> _fetchEvents(String? categoryName) async {
     // Determine the updated position after turning on location services
     Placemark place = await _determinePosition();
@@ -222,14 +231,6 @@ class _HomePageState extends State<HomePage> {
                               fontSize: 18,
                             ),
                           ),
-                          Text(
-                            "View All",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w400,
-                              fontSize: 12,
-                              color: AppColors.greyTextColor,
-                            ),
-                          ),
                         ],
                       ),
                     ),
@@ -246,14 +247,6 @@ class _HomePageState extends State<HomePage> {
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 18,
-                            ),
-                          ),
-                          Text(
-                            "View All",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w400,
-                              fontSize: 12,
-                              color: AppColors.greyTextColor,
                             ),
                           ),
                         ],
@@ -313,6 +306,7 @@ class _HomePageState extends State<HomePage> {
                                 child: EventWidget(
                                   key: Key('event_widget_${event.title}'),
                                   event: event,
+                                  favouriteCount: countFavorites(event.eventId),
                                 ),
                               );
                             }).toList(),
@@ -390,9 +384,15 @@ class _HomePageState extends State<HomePage> {
             Expanded(
               child: TextFormField(
                 controller: _searchController,
+                onFieldSubmitted: (value) {
+                  setState(() {
+                    _searchQuery = value;
+                  });
+                },
                 onChanged: ((value) {
                   if (value == "")
                     setState(() {
+                      _searchQuery = "";
                       _fetchEvents(selectedCategoryName);
                     });
                 }),
@@ -406,17 +406,6 @@ class _HomePageState extends State<HomePage> {
                   border: InputBorder.none,
                 ),
               ),
-            ),
-            IconButton(
-              icon: Icon(Icons.search),
-              onPressed: () {
-                setState(() {
-                  _searchQuery = _searchController.text;
-                  if (_searchQuery.isNotEmpty) {
-                    _fetchEvents(selectedCategoryName);
-                  }
-                });
-              },
             ),
           ],
         ),

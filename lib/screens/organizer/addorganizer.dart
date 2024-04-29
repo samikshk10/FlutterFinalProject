@@ -134,16 +134,26 @@ class _AddOrganizerScreenState extends State<AddOrganizerScreen> {
               ),
               isLoading
                   ? CircularProgressIndicator()
-                  : CustomButton(
-                      label: Text(
-                        "Send Request",
-                        style: TextStyle(fontSize: 24, color: Colors.white),
+                  : Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 10)),
+                        child: Text(
+                          "Send Request",
+                          style: TextStyle(fontSize: 20),
+                        ),
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
+                            _addOrganizer();
+                          }
+                        },
                       ),
-                      press: () {
-                        if (_formKey.currentState!.validate()) {
-                          _addOrganizer();
-                        }
-                      }),
+                    )
             ],
           ),
         ),

@@ -30,6 +30,16 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
     _fetchUserEvents();
   }
 
+  void _deleteUserEvents(String eventId) async {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('events')
+        .where('eventId', isEqualTo: eventId)
+        .get();
+    querySnapshot.docs.forEach((doc) {
+      doc.reference.delete();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -87,6 +97,12 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
                               ),
                             );
                           },
+                          onDeleteConfirmed: () {
+                            print("here>>");
+                            _deleteUserEvents(event.eventId);
+                          },
+                          deleteDialogContent:
+                              "Are you sure you want to remove Event",
                           onDelete: () {},
                         ),
                       );

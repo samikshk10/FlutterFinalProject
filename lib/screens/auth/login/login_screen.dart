@@ -41,9 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       var response;
       response = await AuthMethods.checkAdmin(email, pass);
-      if (response == "success") {
-        SharedPreferences preferences = await SharedPreferences.getInstance();
-        preferences.setBool("isOrganizer", isSwitched);
+      if (response == "admin") {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -51,7 +49,6 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         );
       }
-
       response = await AuthMethods.loginWithEmailAndPassword(
           dialogcontext, email, pass);
       if (isSwitched) {
@@ -59,28 +56,33 @@ class _LoginScreenState extends State<LoginScreen> {
       }
 
       if (response == "success") {
-        SharedPreferences preferences = await SharedPreferences.getInstance();
-        preferences.setBool("isOrganizer", isSwitched);
-        preferences.setBool("isLoggedIn", true);
-
         if (isSwitched) {
-          print("is Swwitched $isSwitched");
+          print("here...");
+          SharedPreferences preferences = await SharedPreferences.getInstance();
+          preferences.setBool("isOrganizer", true);
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => AddEventScreen(),
+              builder: (context) => PageRender(
+                isLoggedInAsOrganizer: true,
+              ),
             ),
           );
+          return;
+        } else {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PageRender(
+                isLoggedInAsOrganizer: false,
+              ),
+            ),
+          );
+          return;
         }
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => PageRender(isLoggedInAsOrganizer: isSwitched),
-          ),
-        );
       } else {
         toastification.show(
-          context: context,
+          context: dialogcontext,
           title: Text(response),
           autoCloseDuration: const Duration(seconds: 5),
         );
@@ -92,20 +94,30 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void handleGoogleSignIn(BuildContext context) async {
     var response;
-    await AuthMethods.signInWithGoogle(context);
+    response = await AuthMethods.signInWithGoogle(context);
     if (isSwitched) {
       UserCredential? userCredential =
           Provider.of<UserCredentialProvider>(context, listen: false)
               .userCredential;
       response =
           await AuthMethods.checkOrganiser(userCredential?.user?.email ?? "");
+      if (response != "success") {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => LoginScreen()),
+        );
+        toastification.show(
+          context: context,
+          title: Text(response),
+          autoCloseDuration: const Duration(seconds: 5),
+        );
+      }
     }
-    print("hello there $response");
 
     if (response == "success") {
-      print("hello");
       SharedPreferences preferences = await SharedPreferences.getInstance();
       preferences.setBool("isOrganizer", isSwitched);
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -120,7 +132,6 @@ class _LoginScreenState extends State<LoginScreen> {
         title: Text(response),
         autoCloseDuration: const Duration(seconds: 5),
       );
-      return;
     }
   }
 
@@ -147,7 +158,7 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               SizedBox(height: 72),
               Text(
-                "Login",
+                "Welcome to EventSphere!",
                 style: TextStyle(fontSize: 24, color: gray),
               ),
               SizedBox(height: 32),
@@ -213,27 +224,50 @@ class _LoginScreenState extends State<LoginScreen> {
                           return errors["password"];
                         },
                       ),
-                      SizedBox(height: 20),
+                      SizedBox(height: 15),
                     ],
                   ),
                 ),
               ),
-              SizedBox(height: 32),
-              Text(
-                "Don't have an account?",
-                style: TextStyle(fontSize: 20),
-              ),
-              CustomButton(
-                  label: Text(
-                    "Sign Up",
-                    style: TextStyle(fontSize: 24, color: Colors.white),
-                  ),
-                  press: () {
+              Align(
+                child: GestureDetector(
+                  onTap: () {
                     Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => SignUpScreen()));
-                  }),
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ResetPassword(
+                            email: _emailController.text.toString().trim()),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    margin: EdgeInsets.only(right: 40),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          "Forgot Password?",
+                          style: TextStyle(
+                            color: Colors.blue,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              CustomButton(
+                label: Text('Login',
+                    style: TextStyle(fontSize: 20, color: Colors.white)),
+                press: () {
+                  if (_formKey.currentState!.validate()) {
+                    handleLogin(context);
+                  }
+                },
+              ),
+              SizedBox(height: 12),
               Text('Or continue with:'),
               SizedBox(height: 10),
               GoogleSignInButton(
@@ -241,36 +275,33 @@ class _LoginScreenState extends State<LoginScreen> {
                   handleGoogleSignIn(context);
                 },
               ),
-              SizedBox(height: 8),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ResetPassword(
-                          email: _emailController.text.toString().trim()),
-                    ),
-                  );
-                },
-                child: Text(
-                  "Forgot Password?",
-                  style: TextStyle(
-                    color: Colors.blue,
-                    decoration: TextDecoration.underline,
+              SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Don't have an account?",
                   ),
-                ),
-              ),
-              SizedBox(height: 24),
-              CustomButton(
-                label: Text(
-                  "Login",
-                  style: TextStyle(fontSize: 24, color: Colors.white),
-                ),
-                press: () {
-                  if (_formKey.currentState!.validate()) {
-                    handleLogin(context);
-                  }
-                },
+                  TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SignUpScreen(),
+                          ),
+                        );
+                      },
+                      child: Transform.translate(
+                        offset: Offset(-8, 0),
+                        child: Text(
+                          "Sign Up",
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.blue,
+                          ),
+                        ),
+                      )),
+                ],
               ),
               SizedBox(height: 24),
             ],

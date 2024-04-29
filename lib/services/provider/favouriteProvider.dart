@@ -21,6 +21,7 @@ class FavouriteProvider extends ChangeNotifier {
   }
 
   Future<void> removeFavourite(String eventId) async {
+    print("inside remove");
     CollectionReference favouriteEvents =
         FirebaseFirestore.instance.collection('favouriteEvents');
 
