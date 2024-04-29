@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutterprojectfinal/screens/customWidgets/formField.dart';
 import 'package:flutterprojectfinal/services/auth.dart';
 
 class ResetPassword extends StatefulWidget {
@@ -12,6 +13,7 @@ class ResetPassword extends StatefulWidget {
 
 class _ResetPasswordState extends State<ResetPassword> {
   late String email;
+  TextEditingController _emailController = TextEditingController();
 
   void handleResetPassword() async {
     AuthMethods authMethods = AuthMethods();
@@ -23,7 +25,12 @@ class _ResetPasswordState extends State<ResetPassword> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xff251f34),
+      appBar: AppBar(
+        title: Text('Reset Password'),
+        backgroundColor: Colors.white,
+        elevation: 0,
+      ),
+      backgroundColor: Colors.white,
       resizeToAvoidBottomInset: true,
       body: Container(
         child: Column(
@@ -32,16 +39,15 @@ class _ResetPasswordState extends State<ResetPassword> {
             children: [
               const Padding(
                 padding: EdgeInsets.fromLTRB(20, 20, 20, 8),
-                child: Text(
-                  'Reset Password',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 25),
+                child: Center(
+                  child: Text(
+                    'Reset Password',
+                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 25),
+                  ),
                 ),
               ),
               SizedBox(
-                height: 30,
+                height: 15,
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -58,36 +64,41 @@ class _ResetPasswordState extends State<ResetPassword> {
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: TextField(
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w400,
-                  ),
-                  keyboardType: TextInputType.emailAddress,
-                  cursorColor: Colors.white,
-                  decoration: InputDecoration(
-                      border: InputBorder.none,
-                      fillColor: const Color(0xff3B324E),
-                      filled: true,
-                      focusedBorder: const OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Color(0xff14dae2), width: 2.0),
-                        borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                      )),
-                  onChanged: (value) {
-                    setState(() {
-                      email = value;
-                    });
+                child: customFormField(
+                  controller: _emailController,
+                  type: TextInputType.text,
+                  validate: (String? value) {
+                    if (value!.isEmpty) {
+                      return "Please enter email";
+                    }
+                    return null;
                   },
+                  label: 'Enter Email to Reset Password',
                 ),
               ),
               SizedBox(
                 height: 10,
               ),
               Center(
-                  child: ElevatedButton(
-                      onPressed: handleResetPassword,
-                      child: Text('Send Request')))
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 20, vertical: 10)),
+                    child: Text(
+                      "Send",
+                      style: TextStyle(fontSize: 20),
+                    ),
+                    onPressed: () {
+                      handleResetPassword();
+                    },
+                  ),
+                ),
+              )
             ]),
       ),
     );

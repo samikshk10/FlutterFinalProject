@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojectfinal/model/event.dart';
 import 'package:flutterprojectfinal/model/eventModel.dart';
@@ -7,8 +8,11 @@ import '../../styleguide.dart';
 
 class EventWidget extends StatelessWidget {
   final EventModel event;
+  final Future<int> favouriteCount;
 
-  const EventWidget({required Key key, required this.event}) : super(key: key);
+  const EventWidget(
+      {required Key key, required this.event, required this.favouriteCount})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -74,14 +78,42 @@ class EventWidget extends StatelessWidget {
                   ),
                   Expanded(
                     flex: 1,
-                    child: Text(
-                      "1D",
-                      textAlign: TextAlign.right,
-                      style: eventLocationTextStyle.copyWith(
-                        fontWeight: FontWeight.w900,
-                      ),
+                    child: FutureBuilder<int>(
+                      future: favouriteCount,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          // If still loading, return a placeholder or a loading indicator
+                          return Transform.scale(
+                              scale: 0.1, child: CircularProgressIndicator());
+                        } else if (snapshot.hasError) {
+                          // If an error occurred while fetching the count, display the error
+                          return Text(
+                            'Error: ${snapshot.error}',
+                            style: TextStyle(color: Colors.red),
+                          );
+                        } else {
+                          // If the data is available, display the count
+                          return Padding(
+                            padding: const EdgeInsets.only(left: 30),
+                            child: Row(
+                              children: [
+                                Icon(Icons.favorite, color: Colors.red),
+                                Text(
+                                  snapshot.data.toString(),
+                                  textAlign: TextAlign.right,
+                                  style: eventLocationTextStyle.copyWith(
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                      },
                     ),
                   )
+
                   /*IconButton(
                     onPressed: () {
                       provider.toggleFavourite(widget.eventModel);

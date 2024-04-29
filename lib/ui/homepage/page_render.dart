@@ -6,6 +6,7 @@ import 'package:flutterprojectfinal/screens/customWidgets/navbar.dart';
 import 'package:flutterprojectfinal/screens/explore/explorePage.dart';
 import 'package:flutterprojectfinal/ui/homepage/homepage.dart';
 import 'package:flutterprojectfinal/screens/profile/userProfile.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PageRender extends StatefulWidget {
   final bool isLoggedInAsOrganizer;
@@ -21,7 +22,6 @@ class _PageRenderState extends State<PageRender> {
   int _selectedIndex = 0;
 
   final List<Widget> _page = [HomePage(), ExplorePage(), UserProfile()];
-
   final List<Widget> _pages = [
     HomePage(),
     ExplorePage(),
@@ -33,6 +33,12 @@ class _PageRenderState extends State<PageRender> {
     setState(() {
       _selectedIndex = index.clamp(0, _pages.length - 1);
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    print(widget.isLoggedInAsOrganizer);
   }
 
   @override

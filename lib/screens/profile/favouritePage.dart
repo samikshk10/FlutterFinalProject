@@ -55,7 +55,9 @@ class _FavouritePageState extends State<FavouritePage> {
     print(events);
     return Scaffold(
       appBar: AppBar(
-        title: Text('Favourite Page'),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        title: Text('Your Favourites'),
       ),
       body: isLoading
           ? Center(
@@ -71,24 +73,30 @@ class _FavouritePageState extends State<FavouritePage> {
                     final eventId = events.keys.toList()[index];
                     final event = events[eventId]!;
                     return ManageEventsTile(
-                      title: event.title,
-                      date: event.startDate,
-                      location: event.location ?? "not specified",
-                      imageUrl: event.imageUrl,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => DetailPage(
-                              eventModel: events[eventId]!,
-                              provider: Provider.of<FavouriteProvider>(context),
-                              key: Key('event_details_${event.title}'),
+                        deleteDialogContent:
+                            "Are you sure you want to remove from Favourite?",
+                        title: event.title,
+                        date: event.startDate,
+                        location: event.location ?? "not specified",
+                        imageUrl: event.imageUrl,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => DetailPage(
+                                eventModel: events[eventId]!,
+                                provider:
+                                    Provider.of<FavouriteProvider>(context),
+                                key: Key('event_details_${event.title}'),
+                              ),
                             ),
-                          ),
-                        );
-                      },
-                      onDelete: () {},
-                    );
+                          );
+                        },
+                        onDeleteConfirmed: () {
+                          Provider.of<FavouriteProvider>(context, listen: false)
+                              .removeFavourite(event.eventId);
+                        },
+                        onDelete: () {});
                   },
                 ),
     );

@@ -47,6 +47,7 @@ class _UserProfileState extends State<UserProfile> {
       await FirebaseAuth.instance.signOut().then((value) async {
         SharedPreferences pref = await SharedPreferences.getInstance();
         pref.clear();
+        pref.remove("isOrganizer");
       });
 
       Navigator.pushReplacementNamed(context, '/');
@@ -132,7 +133,7 @@ class _UserProfileState extends State<UserProfile> {
                   ),
             SizedBox(height: 10),
             ListTile(
-              title: Text('Following'),
+              title: Text('Favourites'),
               tileColor: lightGray,
               onTap: () {
                 Navigator.push(context,
@@ -156,15 +157,49 @@ class _UserProfileState extends State<UserProfile> {
             ),
             SizedBox(height: 10),
             Expanded(child: SizedBox()),
-            CustomButton(
-                label: Text(
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 20, vertical: 10)),
+                child: Text(
                   "Logout",
-                  style: TextStyle(fontSize: 24, color: Colors.white),
+                  style: TextStyle(fontSize: 20),
                 ),
-                press: _logout)
+                onPressed: () {
+                  confirmLogOut(context);
+                },
+              ),
+            )
           ],
         ),
       ),
+    );
+  }
+
+  Future<bool> confirmLogOut(BuildContext context) async {
+    return await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Log Out'),
+          content: Text('Are you sure you want to logout?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text('No'),
+            ),
+            TextButton(
+              onPressed: () => _logout(),
+              child: Text('Yes'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

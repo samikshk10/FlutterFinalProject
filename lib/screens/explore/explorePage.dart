@@ -20,8 +20,18 @@ class ExplorePage extends StatefulWidget {
 
 class _ExplorePageState extends State<ExplorePage> {
   List<EventModel> LocalEvents = [];
+  String _searchQuery = "";
 
   String _selectedCategoryName = "All";
+  Future<int> countFavorites(String eventId) async {
+    QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
+        .instance
+        .collection('favouriteEvents')
+        .where("event", isEqualTo: eventId)
+        .get();
+
+    return snapshot.size;
+  }
 
   Future<List<EventModel>> _fetchEvents(String? categoryName) async {
     QuerySnapshot querySnapshot =
@@ -33,7 +43,7 @@ class _ExplorePageState extends State<ExplorePage> {
           .map((doc) => EventModel.fromFirestore(doc))
           .toList();
     } else {
-      return Future.error("unable to fetch events");
+      return Future.error("No events found.");
     }
   }
 
@@ -45,8 +55,20 @@ class _ExplorePageState extends State<ExplorePage> {
           Padding(
             padding: const EdgeInsets.all(12.0),
             child: SearchBar(
+              onChanged: ((value) {
+                if (value.isEmpty)
+                  setState(() {
+                    _searchQuery = "";
+                    _fetchEvents(_selectedCategoryName);
+                  });
+              }),
               leading: Icon(Icons.search),
               hintText: 'Search for...',
+              onSubmitted: (value) {
+                setState(() {
+                  _searchQuery = value;
+                });
+              },
             ),
           ),
           SingleChildScrollView(
@@ -107,6 +129,17 @@ class _ExplorePageState extends State<ExplorePage> {
                                 "No events found in $_selectedCategoryName category.")),
                   );
                 }
+                if (_searchQuery.isNotEmpty) {
+                  events = events
+                      .where((event) => event.title
+                          .toLowerCase()
+                          .contains(_searchQuery.toLowerCase()))
+                      .toList();
+                  if (events.length == 0) {
+                    return Center(
+                        child: Text("No events found for $_searchQuery"));
+                  }
+                }
                 return Column(
                   children: events.map((event) {
                     return GestureDetector(
@@ -124,6 +157,7 @@ class _ExplorePageState extends State<ExplorePage> {
                       child: EventWidget(
                         key: Key('event_widget_${event.title}'),
                         event: event,
+                        favouriteCount: countFavorites(event.eventId),
                       ),
                     );
                   }).toList(),

@@ -11,21 +11,18 @@ class EventModel {
       imageUrl;
 
   double? longitude, latitude;
-  String? punchLine, location;
-  bool isOnlineEvent;
+  String? location;
   String eventId;
 
   EventModel(
       {required this.eventId,
       required this.title,
       required this.description,
-      required this.isOnlineEvent,
       this.location,
       required this.startDate,
       required this.endDate,
       required this.startTime,
       required this.endTime,
-      this.punchLine,
       required this.category,
       required this.imageUrl,
       this.longitude,
@@ -45,9 +42,7 @@ class EventModel {
       endTime: data['endTime'],
       category: data['category'],
       imageUrl: data['imageUrl'],
-      isOnlineEvent: data['isOnlineEvent'],
       location: data['location'],
-      punchLine: data['punchLine'],
       longitude: data['longitude'],
       latitude: data['latitude'],
     );
@@ -64,9 +59,7 @@ class EventModel {
       endTime: data['endTime'],
       category: data['category'],
       imageUrl: data['imageUrl'],
-      isOnlineEvent: data['isOnlineEvent'],
       location: data['location'],
-      punchLine: data['punchLine'],
       longitude: data['longitude'],
       latitude: data['latitude'], // Assuming name is a field in the map
       // Initialize other properties from the map here

@@ -16,11 +16,11 @@ class AuthMethods {
 
       auth.UserCredential result = await auth.FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
-      if (!result.user!.emailVerified) {
+      if (result.user!.emailVerified == false) {
         return "Please verify your email";
-      }
-      Provider.of<UserCredentialProvider>(context, listen: false)
-          .setUserCredential(result, false);
+      } else
+        Provider.of<UserCredentialProvider>(context, listen: false)
+            .setUserCredential(result, false);
 
       return res = "success";
     } on auth.FirebaseAuthException catch (exception, s) {
@@ -56,7 +56,7 @@ class AuthMethods {
       if (querySnapshot.docs.isNotEmpty) {
         DocumentSnapshot doc = querySnapshot.docs.first;
         if (doc['password'] == password) {
-          return "success";
+          return "admin";
         } else {
           return "incorrect email or password";
         }
@@ -138,7 +138,7 @@ class AuthMethods {
     Provider.of<UserCredentialProvider>(context, listen: false)
         .setUserCredential(userCredential, false);
 
-    return 'successs';
+    return 'success';
   }
 
   Future<void> sendPasswordResetEmail(String email) async {

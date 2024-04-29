@@ -16,7 +16,7 @@
 //   final userStatus status = userStatus.active;
 //   userStatus _selectedStatus = userStatus.active;
 
-//   Future<List<OrganizerModel>> _fetchOrganizer(userStatus status) async {
+//   Future<List<OrganizerModel>> _fetchUsers(userStatus status) async {
 //     QuerySnapshot querySnapshot =
 //         await FirebaseFirestore.instance.collection('organizers').get();
 

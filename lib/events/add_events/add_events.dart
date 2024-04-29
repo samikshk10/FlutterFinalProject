@@ -31,7 +31,6 @@ class _AddEventScreenState extends State<AddEventScreen> {
   TextEditingController _titleController = TextEditingController();
   TextEditingController _descriptionController = TextEditingController();
   TextEditingController _locationController = TextEditingController();
-  TextEditingController _punchLine1Controller = TextEditingController();
   TextEditingController _filePickerController = TextEditingController();
   bool _isOneDayEvent = false;
 
@@ -75,13 +74,13 @@ class _AddEventScreenState extends State<AddEventScreen> {
     // Build the duration string
     String duration = '';
     if (days > 0) {
-      duration += '$days d';
+      duration += '$days D';
     }
     if (hours > 0) {
       if (duration.isNotEmpty) {
         duration += ' ';
       }
-      duration += '$hours h';
+      duration += '$hours H';
     }
 
     return duration;
@@ -92,7 +91,6 @@ class _AddEventScreenState extends State<AddEventScreen> {
     _titleController.clear();
     _descriptionController.clear();
     _locationController.clear();
-    _punchLine1Controller.clear();
     _filePickerController.clear();
     _selectedFile = null;
     _startDate = null;
@@ -165,8 +163,6 @@ class _AddEventScreenState extends State<AddEventScreen> {
       'description': _descriptionController.text,
       'location': _locationController.text,
       'duration': _eventDuration,
-      'punchLine':
-          _punchLine1Controller.text != "" ? _punchLine1Controller.text : null,
       'startDate': _startDate != null ? _startDate!.toIso8601String() : null,
       'endDate': _endDate != null ? _endDate!.toIso8601String() : null,
       'startTime': _startTime != null ? _startTime!.format(context) : null,
@@ -393,16 +389,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
                       ],
                     ),
                     SizedBox(height: 16),
-                    customFormField(
-                      controller: _punchLine1Controller,
-                      type: TextInputType.text,
-                      validate: (String? value) {
-                        return null;
-                      },
-                      label: 'Punch Line',
-                      prefix: Icons.format_quote,
-                    ),
-                    SizedBox(height: 16),
+
                     Row(
                       children: [
                         Text("Is it one day event"),
@@ -621,18 +608,28 @@ class _AddEventScreenState extends State<AddEventScreen> {
                   ],
                 ),
               ),
-              CustomButton(
-                  label: isLoading
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 10)),
+                  child: isLoading
                       ? CircularProgressIndicator()
                       : Text(
-                          "Add Event",
-                          style: TextStyle(fontSize: 24, color: Colors.white),
+                          "Add Events",
+                          style: TextStyle(fontSize: 20),
                         ),
-                  press: () {
+                  onPressed: () {
                     if (_formKey.currentState!.validate()) {
                       _addEvent();
                     }
-                  }),
+                  },
+                ),
+              )
             ],
           ),
         ),

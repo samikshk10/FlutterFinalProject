@@ -14,7 +14,7 @@ class _AuthpageState extends State<Authpage> {
   void checkOrganizer() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     setState(() {
-      isOrganizer = preferences.getBool("isOrganizer") ?? false;
+      isOrganizer = preferences.getBool("isOrganizer");
     });
   }
 
@@ -30,9 +30,14 @@ class _AuthpageState extends State<Authpage> {
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            return PageRender(
-              isLoggedInAsOrganizer: isOrganizer ?? false,
-            );
+            checkOrganizer();
+            if (snapshot.data!.emailVerified) {
+              return PageRender(
+                isLoggedInAsOrganizer: isOrganizer ?? false,
+              );
+            } else {
+              return LoginScreen();
+            }
           }
           return LoginScreen();
         },

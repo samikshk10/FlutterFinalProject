@@ -64,6 +64,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
     Size size = MediaQuery.of(context).size;
 
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Text(""),
+      ),
       resizeToAvoidBottomInset: false,
       body: Container(
         width: size.width,
@@ -149,7 +154,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ? CircularProgressIndicator()
                     : Text(
                         "Sign Up",
-                        style: TextStyle(fontSize: 24, color: Colors.white),
+                        style: TextStyle(fontSize: 20, color: Colors.white),
                       ),
                 press: () {
                   if (_formKey.currentState!.validate()) {
