@@ -22,8 +22,9 @@ class EditProfile extends StatefulWidget {
 
 class _EditProfileState extends State<EditProfile> {
   Uint8List? _image;
-  String? _imageUrl;
+  String? imageUrl;
   String? displayName;
+  bool isLoading = false;
 
   TextEditingController _nameController = TextEditingController();
   Future<String> uploadImage(Uint8List imageBytes, String userId) async {
@@ -43,7 +44,10 @@ class _EditProfileState extends State<EditProfile> {
     });
   }
 
-  void _saveProfile(BuildContext context) async {
+  Future<void> _saveProfile(BuildContext context) async {
+    setState(() {
+      isLoading = true;
+    });
     String? userId = Provider.of<UserCredentialProvider>(context, listen: false)
         .userCredential
         ?.user
@@ -54,6 +58,9 @@ class _EditProfileState extends State<EditProfile> {
     if (userId != null && _image != null) {
       String downloadURL = await uploadImage(_image!, userId);
       userCredential?.user?.updatePhotoURL(downloadURL);
+      setState(() {
+        imageUrl = downloadURL;
+      });
     }
 
     if (userCredential != null) {
@@ -62,6 +69,9 @@ class _EditProfileState extends State<EditProfile> {
           .then((value) => setState(() {
                 displayName = _nameController.text;
               }));
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -121,12 +131,34 @@ class _EditProfileState extends State<EditProfile> {
             SizedBox(
               height: 30,
             ),
-            ElevatedButton(
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 20, vertical: 10)),
+                child: isLoading
+                    ? CircularProgressIndicator()
+                    : Text(
+                        "Save Changes",
+                        style: TextStyle(fontSize: 20),
+                      ),
                 onPressed: () {
-                  _saveProfile(context);
-                  Navigator.pop(context, _nameController.text);
+                  _saveProfile(context).then((value) {
+                    setState(() {
+                      isLoading = false;
+                    });
+                    Navigator.pop(context, {
+                      'displayName': _nameController.text,
+                      'photoURL': imageUrl
+                    });
+                  });
                 },
-                child: Text('Save Changes'))
+              ),
+            )
           ],
         ),
       ),

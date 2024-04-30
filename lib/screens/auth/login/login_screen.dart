@@ -101,17 +101,6 @@ class _LoginScreenState extends State<LoginScreen> {
               .userCredential;
       response =
           await AuthMethods.checkOrganiser(userCredential?.user?.email ?? "");
-      if (response != "success") {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => LoginScreen()),
-        );
-        toastification.show(
-          context: context,
-          title: Text(response),
-          autoCloseDuration: const Duration(seconds: 5),
-        );
-      }
     }
 
     if (response == "success") {

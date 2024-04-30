@@ -11,7 +11,7 @@ class EventModel {
       imageUrl;
 
   double? longitude, latitude;
-  String? location;
+  String? location, duration;
   String eventId;
 
   EventModel(
@@ -19,6 +19,7 @@ class EventModel {
       required this.title,
       required this.description,
       this.location,
+      this.duration,
       required this.startDate,
       required this.endDate,
       required this.startTime,
@@ -33,19 +34,19 @@ class EventModel {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
 
     return EventModel(
-      eventId: data['eventId'],
-      title: data['title'],
-      description: data['description'],
-      startDate: data['startDate'],
-      endDate: data['endDate'],
-      startTime: data['startTime'],
-      endTime: data['endTime'],
-      category: data['category'],
-      imageUrl: data['imageUrl'],
-      location: data['location'],
-      longitude: data['longitude'],
-      latitude: data['latitude'],
-    );
+        eventId: data['eventId'],
+        title: data['title'],
+        description: data['description'],
+        startDate: data['startDate'],
+        endDate: data['endDate'],
+        startTime: data['startTime'],
+        endTime: data['endTime'],
+        category: data['category'],
+        imageUrl: data['imageUrl'],
+        location: data['location'],
+        longitude: data['longitude'],
+        latitude: data['latitude'],
+        duration: data['duration']);
   }
 
   factory EventModel.fromMap(Map<String, dynamic> data) {
@@ -61,8 +62,8 @@ class EventModel {
       imageUrl: data['imageUrl'],
       location: data['location'],
       longitude: data['longitude'],
-      latitude: data['latitude'], // Assuming name is a field in the map
-      // Initialize other properties from the map here
+      latitude: data['latitude'],
+      duration: data['duration'],
     );
   }
 }

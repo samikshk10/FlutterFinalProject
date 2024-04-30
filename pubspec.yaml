@@ -56,6 +56,7 @@ dependencies:
   syncfusion_flutter_maps: ^25.1.40
   firebase_database: ^10.5.2
   shared_preferences: ^2.2.3
+  google_fonts: ^6.2.1
 
 dev_dependencies:
   flutter_test:

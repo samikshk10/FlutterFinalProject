@@ -4,6 +4,7 @@ import 'package:flutterprojectfinal/screens/auth/admin/adminPage.dart';
 import 'package:flutterprojectfinal/screens/auth/auth_page.dart';
 import 'package:flutterprojectfinal/screens/auth/login/login_screen.dart';
 import 'package:flutterprojectfinal/screens/auth/signup/signup_screen.dart';
+import 'package:flutterprojectfinal/screens/profile/userProfile.dart';
 import 'package:flutterprojectfinal/services/provider/userCredentialProvider.dart';
 import 'package:flutterprojectfinal/ui/homepage/page_render.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -45,6 +46,7 @@ class MyApp extends StatelessWidget {
           '/signup': (context) => SignUpScreen(),
           '/addevent': (context) => AddEventScreen(),
           '/admin': (context) => AdminPage(),
+          '/userProfile': (context) => UserProfile(),
         },
       ),
     );

@@ -27,7 +27,7 @@ class EventWidget extends StatelessWidget {
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(24))),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
@@ -95,16 +95,25 @@ class EventWidget extends StatelessWidget {
                         } else {
                           // If the data is available, display the count
                           return Padding(
-                            padding: const EdgeInsets.only(left: 30),
-                            child: Row(
+                            padding: const EdgeInsets.only(left: 26),
+                            child: Column(
                               children: [
-                                Icon(Icons.favorite, color: Colors.red),
                                 Text(
-                                  snapshot.data.toString(),
-                                  textAlign: TextAlign.right,
-                                  style: eventLocationTextStyle.copyWith(
-                                    fontWeight: FontWeight.w900,
-                                  ),
+                                  event.duration ?? "",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16),
+                                ),
+                                SizedBox(height: 5),
+                                Row(
+                                  children: [
+                                    Icon(Icons.favorite, color: Colors.black),
+                                    Text(snapshot.data.toString(),
+                                        textAlign: TextAlign.right,
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 20)),
+                                  ],
                                 ),
                               ],
                             ),

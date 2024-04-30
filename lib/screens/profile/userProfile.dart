@@ -19,8 +19,14 @@ class UserProfile extends StatefulWidget {
 
 class _UserProfileState extends State<UserProfile> {
   String? displayName = FirebaseAuth.instance.currentUser?.displayName;
-
+  String? photoURL = "";
   bool? isOrganizer = false;
+  void updateProfileImage() {
+    setState(() {
+      photoURL = FirebaseAuth.instance.currentUser?.photoURL;
+    });
+  }
+
   void didUpdateWidget(UserProfile oldWidget) {
     super.didUpdateWidget(oldWidget);
     setState(() {
@@ -33,6 +39,7 @@ class _UserProfileState extends State<UserProfile> {
   void initState() {
     super.initState();
     checkOrganizer();
+    updateProfileImage();
   }
 
   void checkOrganizer() async {
@@ -65,12 +72,10 @@ class _UserProfileState extends State<UserProfile> {
             SizedBox(height: 30),
             Stack(
               children: [
-                FirebaseAuth.instance.currentUser?.photoURL != null
+                photoURL != null
                     ? CircleAvatar(
                         radius: 65,
-                        backgroundImage: NetworkImage(
-                            FirebaseAuth.instance.currentUser?.photoURL ??
-                                "sd"))
+                        backgroundImage: NetworkImage(photoURL ?? "sd"))
                     : CircleAvatar(
                         radius: 65,
                         backgroundImage: AssetImage('assets/images/admin.png'),
@@ -94,13 +99,19 @@ class _UserProfileState extends State<UserProfile> {
                   ),
                   IconButton(
                       onPressed: () async {
-                        final name = await Navigator.push(
+                        final result = await Navigator.push(
                             context,
                             MaterialPageRoute(
                                 builder: (context) => EditProfile()));
-                        if (name != null) {
+
+                        updateProfileImage();
+                        if (result['displayName'] != null) {
                           setState(() {
-                            displayName = name;
+                            displayName = result['displayName'];
+                          });
+                        } else if (result['photoURL'] != null) {
+                          setState(() {
+                            photoURL = result['photoURL'];
                           });
                         }
                       },

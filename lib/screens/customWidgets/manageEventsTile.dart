@@ -37,7 +37,8 @@ class ManageEventsTile extends StatelessWidget {
         confirmDismiss: (_) => confirmDelete(context),
         onDismissed: (_) => onDelete(),
         child: Container(
-          margin: EdgeInsets.symmetric(vertical: 5),
+          margin: EdgeInsets.symmetric(vertical: 7),
+          padding: EdgeInsets.symmetric(horizontal: 15),
           child: Card(
             elevation: 5,
             child: ListTile(

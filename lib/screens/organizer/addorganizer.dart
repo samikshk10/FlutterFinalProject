@@ -32,8 +32,17 @@ class _AddOrganizerScreenState extends State<AddOrganizerScreen> {
     _phoneNumberController.clear();
   }
 
-// Inside the onPressed callback of your "Add Event" button
   void _addOrganizer() async {
+    QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
+        .instance
+        .collection('organizers')
+        .where("email", isEqualTo: FirebaseAuth.instance.currentUser?.email)
+        .get();
+
+    if (snapshot.size >= 0) {
+      return FlashMessage.show(context,
+          message: "You have already sent Request", isSuccess: true);
+    }
     CollectionReference organizers =
         FirebaseFirestore.instance.collection('organizers');
 
