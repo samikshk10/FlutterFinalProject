@@ -39,7 +39,7 @@ class _AddOrganizerScreenState extends State<AddOrganizerScreen> {
         .where("email", isEqualTo: FirebaseAuth.instance.currentUser?.email)
         .get();
 
-    if (snapshot.size >= 0) {
+    if (snapshot.size > 0) {
       return FlashMessage.show(context,
           message: "You have already sent Request", isSuccess: true);
     }

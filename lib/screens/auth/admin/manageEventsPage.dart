@@ -78,8 +78,9 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
                       final event = events[index];
                       return Padding(
                         padding: EdgeInsets.symmetric(
-                            vertical: 8.0, horizontal: 16.0),
+                            vertical: 2.0, horizontal: 4.0),
                         child: ManageEventsTile(
+                          eventId: event.eventId,
                           title: event.title,
                           date: event.startDate,
                           location: event.location ?? "not specified",

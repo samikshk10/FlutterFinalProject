@@ -170,7 +170,8 @@ class _AddEventScreenState extends State<AddEventScreen> {
       'imageUrl': imageUrl,
       'category': _selectedCategory,
       'longitude': _longitude.isNullOrEmpty ? null : _longitude,
-      'latitude': _latitude.isNullOrEmpty ? null : _latitude
+      'latitude': _latitude.isNullOrEmpty ? null : _latitude,
+      'createdAt': DateTime.now().toIso8601String()
     }).then((value) {
       // Show success message or navigate to another screen
       FlashMessage.show(context,
@@ -274,7 +275,12 @@ class _AddEventScreenState extends State<AddEventScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Event'),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        title: Text(
+          'Add Events',
+          style: TextStyle(color: Colors.black),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
