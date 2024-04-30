@@ -74,7 +74,7 @@ class DetailPage extends StatelessWidget {
                 return CircleButton(
                   icon: Icon(
                     isFavorite ? Icons.favorite : Icons.favorite_border,
-                    color: isFavorite ? Colors.black : Colors.white,
+                    color: isFavorite ? Colors.red : Colors.white,
                   ),
                   onTap: () {
                     provider.toggleFavourite(eventModel);

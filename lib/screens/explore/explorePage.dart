@@ -34,8 +34,11 @@ class _ExplorePageState extends State<ExplorePage> {
   }
 
   Future<List<EventModel>> _fetchEvents(String? categoryName) async {
-    QuerySnapshot querySnapshot =
-        await FirebaseFirestore.instance.collection('events').get();
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('events')
+        .orderBy('createdAt',
+            descending: true) // Order by createdAt in descending order
+        .get();
     if (querySnapshot.docs.isNotEmpty) {
       return querySnapshot.docs
           .where((doc) =>

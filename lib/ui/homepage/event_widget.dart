@@ -107,7 +107,7 @@ class EventWidget extends StatelessWidget {
                                 SizedBox(height: 5),
                                 Row(
                                   children: [
-                                    Icon(Icons.favorite, color: Colors.black),
+                                    Icon(Icons.favorite, color: Colors.red),
                                     Text(snapshot.data.toString(),
                                         textAlign: TextAlign.right,
                                         style: TextStyle(

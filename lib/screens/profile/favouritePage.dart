@@ -77,6 +77,7 @@ class _FavouritePageState extends State<FavouritePage> {
                     final eventId = events.keys.toList()[index];
                     final event = events[eventId]!;
                     return ManageEventsTile(
+                        eventId: event.eventId,
                         deleteDialogContent:
                             "Are you sure you want to remove from Favourite?",
                         title: event.title,

@@ -11,7 +11,7 @@ class EventModel {
       imageUrl;
 
   double? longitude, latitude;
-  String? location, duration;
+  String? location, duration, createdAt;
   String eventId;
 
   EventModel(
@@ -27,7 +27,8 @@ class EventModel {
       required this.category,
       required this.imageUrl,
       this.longitude,
-      this.latitude});
+      this.latitude,
+      this.createdAt});
 
   // Factory method to create Event instance from Firestore document snapshot
   factory EventModel.fromFirestore(DocumentSnapshot doc) {
@@ -46,24 +47,25 @@ class EventModel {
         location: data['location'],
         longitude: data['longitude'],
         latitude: data['latitude'],
-        duration: data['duration']);
+        duration: data['duration'],
+        createdAt: data['createdAt']);
   }
 
   factory EventModel.fromMap(Map<String, dynamic> data) {
     return EventModel(
-      eventId: data['eventId'],
-      title: data['title'],
-      description: data['description'],
-      startDate: data['startDate'],
-      endDate: data['endDate'],
-      startTime: data['startTime'],
-      endTime: data['endTime'],
-      category: data['category'],
-      imageUrl: data['imageUrl'],
-      location: data['location'],
-      longitude: data['longitude'],
-      latitude: data['latitude'],
-      duration: data['duration'],
-    );
+        eventId: data['eventId'],
+        title: data['title'],
+        description: data['description'],
+        startDate: data['startDate'],
+        endDate: data['endDate'],
+        startTime: data['startTime'],
+        endTime: data['endTime'],
+        category: data['category'],
+        imageUrl: data['imageUrl'],
+        location: data['location'],
+        longitude: data['longitude'],
+        latitude: data['latitude'],
+        duration: data['duration'],
+        createdAt: data['createdAt']);
   }
 }

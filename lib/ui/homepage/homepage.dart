@@ -162,8 +162,10 @@ class _HomePageState extends State<HomePage> {
     // Determine the updated position after turning on location services
     Placemark place = await _determinePosition();
     // Use the updated location to fetch events
-    QuerySnapshot querySnapshot =
-        await FirebaseFirestore.instance.collection('events').get();
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('events')
+        .orderBy('createdAt', descending: true)
+        .get();
     if (querySnapshot.docs.isNotEmpty) {
       return querySnapshot.docs
           .where((doc) =>
