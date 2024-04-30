@@ -15,8 +15,10 @@ class ManageEventsPage extends StatefulWidget {
 
 class _ManageEventsPageState extends State<ManageEventsPage> {
   Future<List<EventModel>> _fetchUserEvents() async {
-    QuerySnapshot querySnapshot =
-        await FirebaseFirestore.instance.collection('events').get();
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('events')
+        .orderBy('createdAt', descending: true)
+        .get();
     print(FirebaseAuth.instance.currentUser!.uid);
     return querySnapshot.docs
         .where((doc) => doc['userId'] == FirebaseAuth.instance.currentUser!.uid)
@@ -117,11 +119,16 @@ class _ManageEventsPageState extends State<ManageEventsPage> {
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.blue,
-        onPressed: () {
+        onPressed: () async {
           // Navigate to the screen to add events
           // For example:
-          Navigator.push(context,
+          final result = await Navigator.push(context,
               MaterialPageRoute(builder: (context) => AddEventScreen()));
+          if (result != null && result) {
+            setState(() {
+              _fetchUserEvents();
+            });
+          }
         },
         child: Icon(
           Icons.add,

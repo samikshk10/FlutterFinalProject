@@ -104,7 +104,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
   }
 
 // Inside the onPressed callback of your "Add Event" button
-  void _addEvent() async {
+  void _addEvent(BuildContext context) async {
     bool dateError = false;
     bool timeError = false;
 
@@ -177,7 +177,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
       FlashMessage.show(context,
           message: "Event added successfully!", isSuccess: true);
       _resetForm();
-      print("Event added successfully!");
+      Navigator.pop(context, true);
     }).catchError((error) {
       // Show error message
       FlashMessage.show(context,
@@ -631,7 +631,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
                         ),
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
-                      _addEvent();
+                      _addEvent(context);
                     }
                   },
                 ),
