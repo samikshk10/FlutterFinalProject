@@ -8,8 +8,8 @@ class FlashMessage {
       context: context,
       title: Text(message),
       description: Text(desc ?? ""),
-      foregroundColor: Colors.white,
-      backgroundColor: !isSuccess ? Colors.redAccent : Colors.blue[300]!,
+      foregroundColor: !isSuccess ? Colors.white : Colors.black,
+      backgroundColor: !isSuccess ? Colors.red[200] : Colors.white,
       autoCloseDuration: const Duration(seconds: 5),
     );
   }

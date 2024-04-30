@@ -14,6 +14,8 @@ final TextStyle whiteHeadingTextStyle = TextStyle(
 
 final TextStyle blackHeadingTextStyle =
     TextStyle(fontSize: 40.0, fontWeight: FontWeight.bold, color: Colors.black);
+final TextStyle headingTextStyle =
+    TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold, color: Colors.black);
 
 final TextStyle categoryTextStyle = TextStyle(
   fontSize: 14.0,
@@ -38,7 +40,7 @@ final TextStyle eventWhiteTitleTextStyle = TextStyle(
 );
 
 final TextStyle eventLocationTextStyle = TextStyle(
-  fontSize: 20.0,
+  fontSize: 16.0,
   color: Color(0xFF000000),
 );
 

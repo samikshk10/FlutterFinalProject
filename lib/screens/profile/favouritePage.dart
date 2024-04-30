@@ -15,18 +15,20 @@ class FavouritePage extends StatefulWidget {
 }
 
 class _FavouritePageState extends State<FavouritePage> {
-  bool isLoading = true;
+  bool isLoading = false;
   Map<String, EventModel> events = {};
 
   @override
   void initState() {
     super.initState();
-    if (isLoading) {
-      getFavourites();
-    }
+
+    getFavourites();
   }
 
   Future<void> getFavourites() async {
+    setState(() {
+      isLoading = true;
+    });
     CollectionReference favouriteEvents =
         FirebaseFirestore.instance.collection('favouriteEvents');
     final currentUserUid = FirebaseAuth.instance.currentUser!.uid;
@@ -44,7 +46,6 @@ class _FavouritePageState extends State<FavouritePage> {
         events[eventId] = event;
       }
     }
-    // Set isLoading to false only after data fetching is complete
     setState(() {
       isLoading = false;
     });
@@ -57,7 +58,10 @@ class _FavouritePageState extends State<FavouritePage> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
-        title: Text('Your Favourites'),
+        title: Text(
+          'Your Favourites',
+          style: TextStyle(color: Colors.black),
+        ),
       ),
       body: isLoading
           ? Center(

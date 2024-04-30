@@ -26,8 +26,10 @@ class _DashboardPageState extends State<DashboardPage> {
           await FirebaseFirestore.instance.collection('users').get();
       QuerySnapshot eventsSnapshot =
           await FirebaseFirestore.instance.collection('events').get();
-      QuerySnapshot organizersSnapshot =
-          await FirebaseFirestore.instance.collection('organizers').get();
+      QuerySnapshot organizersSnapshot = await FirebaseFirestore.instance
+          .collection('organizers')
+          .where("status", isEqualTo: "approved")
+          .get();
 
       setState(() {
         _numberOfUsers = usersSnapshot.size;

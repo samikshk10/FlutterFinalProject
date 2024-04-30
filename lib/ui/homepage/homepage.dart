@@ -12,6 +12,7 @@ import 'package:flutterprojectfinal/ui/homepage/event_widget.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../app_state.dart';
 import 'category_widget.dart';
 import 'event_widget.dart';
@@ -34,12 +35,19 @@ class _HomePageState extends State<HomePage> {
       RefreshController(initialRefresh: false);
   String selectedCategoryName = "All";
   final TextEditingController _searchController = TextEditingController();
-
+  bool isOrganizer = false;
   String _searchQuery = "";
+  void checkOrganizer() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      isOrganizer = pref.getBool("isOrganizer") ?? false;
+    });
+  }
 
   @override
   void initState() {
     super.initState();
+    checkOrganizer();
   }
 
   Future<List<EventModel>> _fetchPopularEvents() async {
@@ -165,7 +173,7 @@ class _HomePageState extends State<HomePage> {
           .map((doc) => EventModel.fromFirestore(doc))
           .toList();
     } else {
-      return Future.error("unable to fetch events");
+      return Future.error("No events found");
     }
   }
 
@@ -196,12 +204,19 @@ class _HomePageState extends State<HomePage> {
                         ],
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                      child: Text(
-                        "What's Up",
-                        style: blackHeadingTextStyle,
-                      ),
+                    Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 32.0, vertical: 8.0),
+                          child: isOrganizer
+                              ? Text("Organizer", style: headingTextStyle)
+                              : Text(
+                                  "What's Up",
+                                  style: blackHeadingTextStyle,
+                                ),
+                        ),
+                      ],
                     ),
                     _buildSearch(),
                     Padding(
@@ -234,9 +249,8 @@ class _HomePageState extends State<HomePage> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 16),
                     _popularEventsBuilder(),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 10),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24),
                       child: Row(

@@ -74,13 +74,13 @@ class _AddEventScreenState extends State<AddEventScreen> {
     // Build the duration string
     String duration = '';
     if (days > 0) {
-      duration += '$days D';
+      duration += '${days}D';
     }
     if (hours > 0) {
       if (duration.isNotEmpty) {
         duration += ' ';
       }
-      duration += '$hours H';
+      duration += '${hours}H';
     }
 
     return duration;

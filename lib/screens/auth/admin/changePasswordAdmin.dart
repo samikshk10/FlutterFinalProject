@@ -1,17 +1,19 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ez_validator/ez_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojectfinal/screens/customWidgets/formField.dart';
 import 'package:flutterprojectfinal/validators/authValidators.dart';
 import 'package:flutterprojectfinal/widgets/globalwidget/flashmessage.dart';
 
-class ChangePasswordPage extends StatefulWidget {
-  const ChangePasswordPage({super.key});
+class ChangePasswordAdmin extends StatefulWidget {
+  const ChangePasswordAdmin({super.key});
 
   @override
-  State<ChangePasswordPage> createState() => _ChangePasswordPageState();
+  State<ChangePasswordAdmin> createState() => _ChangePasswordAdminState();
 }
 
-class _ChangePasswordPageState extends State<ChangePasswordPage> {
+class _ChangePasswordAdminState extends State<ChangePasswordAdmin> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _newPasswordController = TextEditingController();
@@ -22,32 +24,28 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   bool _isNewPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
 
-  Future<void> _changePassword(String oldPassword, String newPassword) async {
-    try {
-      AuthCredential credential = EmailAuthProvider.credential(
-        email: FirebaseAuth.instance.currentUser!.email!,
-        password: oldPassword,
-      );
-      await FirebaseAuth.instance.currentUser!
-          .reauthenticateWithCredential(credential);
+  Future<void> _changePassword(String password, String newPassword) async {
+    CollectionReference admin = FirebaseFirestore.instance.collection('admin');
 
-      // If reauthentication succeeds, update the password
-      await FirebaseAuth.instance.currentUser!.updatePassword(newPassword);
-      FlashMessage.show(context, message: "Password Changed");
-      _resetForm();
-    } on FirebaseAuthException catch (e) {
-      switch (e.code) {
-        case 'weak-password':
-          throw Exception('The password provided is too weak.');
-        case 'requires-recent-login':
-          throw Exception('To change your password, please login again.');
-        case 'user-mismatch':
-          throw Exception(
-              'The old password provided does not match your current password.');
-        case 'user-not-found':
-          throw Exception('User not found. Please check your credentials.');
-        default:
-          throw Exception('Failed to change password: ${e.message}');
+    final adminSnapshot = await FirebaseFirestore.instance
+        .collection('admin')
+        .where('email', isEqualTo: "admin@gmail.com")
+        .get();
+
+    if (!adminSnapshot.isNullOrEmpty) {
+      final adminData = adminSnapshot.docs.first.data();
+      print(adminData["password"]);
+
+      if (adminData["password"] != password) {
+        FlashMessage.show(context, message: "Incorrect old Password");
+        return;
+      } else {
+        admin
+            .doc(adminSnapshot.docs.first.id)
+            .update({"password": newPassword});
+        FlashMessage.show(context,
+            message: "Password Changed Successfully", isSuccess: true);
+        _resetForm();
       }
     }
   }
@@ -61,14 +59,6 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        title: Text(
-          'Change Password',
-          style: TextStyle(color: Colors.black),
-        ),
-      ),
       body: Padding(
         padding: EdgeInsets.all(10),
         child: Form(
@@ -163,11 +153,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                       ),
                       onPressed: () {
                         _changePassword(_passwordController.text,
-                                _newPasswordController.text)
-                            .catchError((onError) {
-                          FlashMessage.show(context,
-                              message: onError.toString());
-                        });
+                            _newPasswordController.text);
                       },
                     ),
                   )

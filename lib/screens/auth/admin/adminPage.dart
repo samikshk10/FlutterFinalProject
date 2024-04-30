@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterprojectfinal/screens/auth/admin/dashboard.dart';
 import 'package:flutterprojectfinal/screens/auth/admin/manageEventsPage.dart';
-import 'package:flutterprojectfinal/screens/auth/admin/manageUsersPage.dart';
+import 'package:flutterprojectfinal/screens/auth/admin/changePasswordAdmin.dart';
 import 'package:flutterprojectfinal/screens/auth/admin/organizer/organizer_request.dart';
 import 'package:flutterprojectfinal/screens/auth/admin/settingsPage.dart';
 import 'package:flutterprojectfinal/screens/auth/auth_page.dart';
@@ -41,8 +41,10 @@ class _AdminPageState extends State<AdminPage> {
       QuerySnapshot usersSnapshot = await _firestore.collection('users').get();
       QuerySnapshot eventsSnapshot =
           await _firestore.collection('events').get();
-      QuerySnapshot organizersSnapshot =
-          await _firestore.collection('organizers').get();
+      QuerySnapshot organizersSnapshot = await _firestore
+          .collection('organizers')
+          .where("status", isEqualTo: "approved")
+          .get();
 
       setState(() {
         _numberOfUsers = usersSnapshot.size;
@@ -70,11 +72,11 @@ class _AdminPageState extends State<AdminPage> {
         pageContent = DashboardPage();
         break;
 
-      case 'Manage Users':
-        pageContent = Container();
-        break;
       case 'Organizer Request':
         pageContent = OrganizerRequestCard();
+        break;
+      case 'Change Password':
+        pageContent = ChangePasswordAdmin();
         break;
       case 'LogOut':
         pageContent = Container();
@@ -86,7 +88,7 @@ class _AdminPageState extends State<AdminPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Admin Page - $_currentPage'),
+        title: Text('Admin - $_currentPage'),
       ),
       drawer: Drawer(
         child: ListView(
@@ -97,7 +99,7 @@ class _AdminPageState extends State<AdminPage> {
                 color: Colors.blue,
               ),
               child: Text(
-                'Event Finder Admin',
+                'Event Sphere Admin',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 24,
@@ -109,17 +111,16 @@ class _AdminPageState extends State<AdminPage> {
               onTap: () => _navigateTo('Dashboard'),
             ),
             ListTile(
-              title: Text('Manage Users'),
-              onTap: () => _navigateTo('Manage Users'),
-            ),
-            ListTile(
               title: Text('Organizer Request'),
               onTap: () => _navigateTo('Organizer Request'),
             ),
             ListTile(
+              title: Text('Change Password'),
+              onTap: () => _navigateTo('Change Password'),
+            ),
+            ListTile(
                 title: Text("Logout"),
                 onTap: () async {
-                  print("hello");
                   Navigator.pushReplacement(context,
                       MaterialPageRoute(builder: (context) => Authpage()));
                 }),

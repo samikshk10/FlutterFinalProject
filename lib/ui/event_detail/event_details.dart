@@ -6,6 +6,7 @@ import 'package:flutterprojectfinal/services/provider/favouriteProvider.dart';
 import 'package:flutterprojectfinal/widgets/globalwidget/circlebutton.dart';
 import 'package:syncfusion_flutter_maps/maps.dart';
 import 'package:intl/intl.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class DetailPage extends StatelessWidget {
   final EventModel eventModel;
@@ -73,7 +74,7 @@ class DetailPage extends StatelessWidget {
                 return CircleButton(
                   icon: Icon(
                     isFavorite ? Icons.favorite : Icons.favorite_border,
-                    color: isFavorite ? Colors.red : null,
+                    color: isFavorite ? Colors.black : Colors.white,
                   ),
                   onTap: () {
                     provider.toggleFavourite(eventModel);
@@ -168,7 +169,6 @@ class DetailPage extends StatelessWidget {
         tabs: [
           Tab(icon: Icon(Icons.info_outline)),
           Tab(icon: Icon(Icons.location_on)),
-          Tab(icon: Icon(Icons.comment)),
         ],
       ),
     );
@@ -211,20 +211,25 @@ class DetailPage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          SingleChildScrollView(
-            child: RichText(
-              textAlign: TextAlign.justify,
-              text: TextSpan(
-                text: eventModel.description,
-                style: const TextStyle(
-                  color: AppColors.greyTextColor,
-                  fontSize: 18,
-                  height: 1.75,
+          Expanded(
+            child: Container(
+              height: 300,
+              child: SingleChildScrollView(
+                child: Text(
+                  textAlign: TextAlign.justify,
+                  eventModel.description,
+                  style: GoogleFonts.nunito(
+                    textStyle: TextStyle(
+                      color: AppColors.greyTextColor,
+                      fontSize: 18,
+                      height: 1.75,
+                    ),
+                  ),
                 ),
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 25),
           _buildDateTimeRow(
             title1: 'Start',
             title2: 'End',

@@ -205,7 +205,7 @@ class _OrganizerRequestCardState extends State<OrganizerRequestCard> {
 
   Widget _buildTabs() {
     return Container(
-      height: 300, // Adjust height as needed
+      height: 1000, // Adjust height as needed
       child: TabBarView(
         children: [
           // Contents of the first tab,
@@ -223,7 +223,6 @@ class _OrganizerRequestCardState extends State<OrganizerRequestCard> {
   Widget _buildListView(OrganizerStatus status) {
     setState(() {
       _selectedStatus = status;
-      print("here>>>");
     });
 
     return FutureBuilder<List<OrganizerModel>>(
@@ -242,32 +241,36 @@ class _OrganizerRequestCardState extends State<OrganizerRequestCard> {
             return Center(child: Text('No requests found'));
           }
           SizedBox(height: 26);
-          return ListView.builder(
-            itemCount: organizers.length,
-            itemBuilder: (context, index) {
-              OrganizerModel organizer = organizers[index];
-              DateTime dt = organizer.createdAt.toDate();
-              return Container(
-                padding: EdgeInsets.only(bottom: 12),
-                child: Card(
-                  surfaceTintColor: Colors.transparent,
+          return Container(
+            height: 800,
+            child: ListView.builder(
+              itemCount: organizers.length,
+              itemBuilder: (context, index) {
+                OrganizerModel organizer = organizers[index];
+                DateTime dt = organizer.createdAt.toDate();
+                return Container(
+                  padding: EdgeInsets.only(bottom: 12),
+                  child: Card(
+                    surfaceTintColor: Colors.transparent,
 
-                  elevation: 4.0, // Adjust shadow elevation as desired
-                  shadowColor: Colors.grey.withOpacity(0.5), // Set shadow color
+                    elevation: 4.0, // Adjust shadow elevation as desired
+                    shadowColor:
+                        Colors.grey.withOpacity(0.5), // Set shadow color
 
-                  child: ListTile(
-                    onTap: () {
-                      // Show detailed information and action buttons
-                      _showDialog(context, organizer);
-                    },
-                    title: Text(organizer.organizerName),
-                    subtitle: Text(organizer.email),
-                    trailing: Text(dt
-                        .toString()), // Assuming createdAt is the date requested
+                    child: ListTile(
+                      onTap: () {
+                        // Show detailed information and action buttons
+                        _showDialog(context, organizer);
+                      },
+                      title: Text(organizer.organizerName),
+                      subtitle: Text(organizer.email),
+                      trailing: Text(dt
+                          .toString()), // Assuming createdAt is the date requested
+                    ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           );
         }
       },
