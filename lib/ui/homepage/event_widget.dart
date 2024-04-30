@@ -6,7 +6,7 @@ import 'package:flutterprojectfinal/services/provider/favouriteProvider.dart';
 import 'package:provider/provider.dart';
 import '../../styleguide.dart';
 
-class EventWidget extends StatelessWidget {
+class EventWidget extends StatefulWidget {
   final EventModel event;
   final Future<int> favouriteCount;
 
@@ -15,10 +15,25 @@ class EventWidget extends StatelessWidget {
       : super(key: key);
 
   @override
+  State<EventWidget> createState() => _EventWidgetState();
+}
+
+class _EventWidgetState extends State<EventWidget> {
+  Future<int> countFavorites(String eventId) async {
+    QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
+        .instance
+        .collection('favouriteEvents')
+        .where("event", isEqualTo: eventId)
+        .get();
+
+    return snapshot.size;
+  }
+
+  @override
   Widget build(BuildContext context) {
     final provider = Provider.of<FavouriteProvider>(context);
     final Event eventModel;
-    List<String> locations = event.location?.split(',') ?? [];
+    List<String> locations = widget.event.location?.split(',') ?? [];
 
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 20),
@@ -36,7 +51,7 @@ class EventWidget extends StatelessWidget {
                 Radius.circular(30),
               ),
               child: Image.network(
-                event.imageUrl,
+                widget.event.imageUrl,
                 height: 150,
                 fit: BoxFit.fitWidth,
               ),
@@ -51,7 +66,7 @@ class EventWidget extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Text(
-                          event.title,
+                          widget.event.title,
                           style: eventTitleTextStyle,
                         ),
                         SizedBox(
@@ -79,7 +94,7 @@ class EventWidget extends StatelessWidget {
                   Expanded(
                     flex: 1,
                     child: FutureBuilder<int>(
-                      future: favouriteCount,
+                      future: countFavorites(widget.event.eventId),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
@@ -99,7 +114,7 @@ class EventWidget extends StatelessWidget {
                             child: Column(
                               children: [
                                 Text(
-                                  event.duration ?? "",
+                                  widget.event.duration ?? "",
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16),
